@@ -1,0 +1,23 @@
+app = "agencyops"
+primary_region = "den"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[mounts]]
+  source = "agencyops_data"
+  destination = "/data"
+
+[env]
+  PORT = "8080"
+  DATABASE_URL = "file:/data/agencyops.db"
+  CHANNEL_MODE = "mock"
+  LLM_PROVIDER = "auto"
+  COMPUTER_PROVIDER = "stub"

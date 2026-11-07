@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Agency {
+  id              String        @id @default(cuid())
+  name            String
+  slug            String        @unique
+  productName     String        @default("AgencyOps")
+  accentColor     String        @default("#E6F08A")
+  mark            String        @default("A")
+  timezone        String        @default("America/Denver")
+  monthlyCapCents Int           @default(50000)
+  callBase        Int           @default(0)
+  approvalBase    Int           @default(0)
+  answeredRate    Int           @default(92)
+  createdAt       DateTime      @default(now())
+  users           User[]
+  invites         Invite[]
+  bots            Bot[]
+  threads         Thread[]
+  approvals       Approval[]
+  tasks           Task[]
+  auditLogs       AuditLog[]
+  usageEvents     UsageEvent[]
+  connectors      Connector[]
+  contacts        Contact[]
+  calls           CallSession[]
+  vaultEntries    VaultEntry[]
+}
+
+model User {
+  id           String     @id @default(cuid())
+  agencyId     String
+  email        String
+  name         String
+  passwordHash String
+  role         String
+  createdAt    DateTime   @default(now())
+  agency       Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  decisions    Approval[] @relation("Decider")
+
+  @@unique([agencyId, email])
+}
+
+model Invite {
+  id         String    @id @default(cuid())
+  agencyId   String
+  email      String
+  role       String    @default("STAFF")
+  token      String    @unique
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+  agency     Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model Bot {
+  id              String        @id @default(cuid())
+  agencyId        String
+  slug            String
+  name            String
+  roleTitle       String
+  blurb           String
+  color           String
+  instructions    String
+  memoryNotes     String        @default("")
+  channelsJson    String        @default("{}")
+  phone           String        @default("")
+  email           String        @default("")
+  monthlyCapCents Int
+  spentCents      Int           @default(0)
+  spentMonth      String        @default("")
+  tokensIn        Int           @default(0)
+  tokensOut       Int           @default(0)
+  statusLine      String        @default("")
+  statusAt        DateTime      @default(now())
+  paused          Boolean       @default(false)
+  pausedReason    String        @default("")
+  sortOrder       Int           @default(0)
+  computerJson    String        @default("{}")
+  agency          Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  threads         Thread[]
+  messages        Message[]
+  approvals       Approval[]
+  tasks           Task[]
+  activities      Activity[]
+  usageEvents     UsageEvent[]
+  calls           CallSession[]
+
+  @@unique([agencyId, slug])
+}
+
+model Thread {
+  id          String    @id @default(cuid())
+  agencyId    String
+  botId       String
+  title       String
+  channel     String    @default("chat")
+  contactName String    @default("")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  agency      Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  bot         Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@index([botId, updatedAt])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  agencyId  String
+  botId     String
+  threadId  String
+  role      String
+  content   String
+  metaJson  String   @default("{}")
+  createdAt DateTime @default(now())
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+}
+
+model Approval {
+  id           String    @id @default(cuid())
+  agencyId     String
+  botId        String
+  threadId     String?
+  kind         String
+  status       String    @default("pending")
+  title        String
+  payloadJson  String
+  dispatchJson String    @default("")
+  createdAt    DateTime  @default(now())
+  decidedAt    DateTime?
+  decidedById  String?
+  agency       Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  bot          Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+  decidedBy    User?     @relation("Decider", fields: [decidedById], references: [id])
+
+  @@index([agencyId, status])
+  @@index([botId, createdAt])
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  agencyId  String
+  botId     String
+  title     String
+  detail    String   @default("")
+  status    String   @default("open")
+  needsYou  Boolean  @default(false)
+  queue     Boolean  @default(false)
+  createdAt DateTime @default(now())
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  agencyId  String
+  actorType String
+  actorId   String   @default("")
+  actorName String   @default("")
+  action    String
+  target    String   @default("")
+  detail    String   @default("")
+  createdAt DateTime @default(now())
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, createdAt])
+}
+
+model UsageEvent {
+  id         String   @id @default(cuid())
+  agencyId   String
+  botId      String
+  provider   String
+  model      String   @default("")
+  tokensIn   Int      @default(0)
+  tokensOut  Int      @default(0)
+  costCents  Int      @default(0)
+  kind       String   @default("llm")
+  monthKey   String
+  dayKey     String
+  createdAt  DateTime @default(now())
+  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  bot        Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, monthKey])
+  @@index([botId, dayKey])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  agencyId  String
+  botId     String
+  text      String
+  screen    String   @default("")
+  createdAt DateTime @default(now())
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@index([botId, createdAt])
+}
+
+model CallSession {
+  id          String    @id @default(cuid())
+  agencyId    String
+  botId       String
+  contactName String
+  phone       String    @default("")
+  direction   String    @default("inbound")
+  status      String    @default("live")
+  summary     String    @default("")
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  agency      Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  bot         Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, status])
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  agencyId  String
+  name      String
+  phone     String   @default("")
+  email     String   @default("")
+  notes     String   @default("")
+  createdAt DateTime @default(now())
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model Connector {
+  id       String @id @default(cuid())
+  agencyId String
+  key      String
+  name     String
+  status   String
+  detail   String @default("")
+  agency   Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, key])
+}
+
+model VaultEntry {
+  id        String   @id @default(cuid())
+  agencyId  String
+  label     String
+  username  String   @default("")
+  secretRef String   @default("keychain")
+  createdAt DateTime @default(now())
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
