@@ -1,0 +1,13 @@
+title = "AgencyOps"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Empty env placeholders and the documented sk-ant-... example in the README. Not credentials."
+regexes = [
+  '''(?i)(KEY|TOKEN|SECRET|AGENCY_ID)=""''',
+  '''HAWKSOFT_AGENCY_ID=''',
+  '''sk-ant-\.\.\.''',
+  '''sk-\.\.\.''',
+]

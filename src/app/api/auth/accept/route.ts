@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { hashPassword, setSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { demoInviteBlocked } from "@/lib/demo-mode";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
@@ -13,6 +14,12 @@ export async function POST(request: Request) {
   const password = body?.password ?? "";
   if (!token || !name || password.length < 8) {
     return NextResponse.json({ error: "Name and a password of at least 8 characters are required." }, { status: 400 });
+  }
+  if (demoInviteBlocked(token)) {
+    return NextResponse.json(
+      { error: "This demo invite is disabled. Set DEMO_MODE=true only for the public showcase." },
+      { status: 403 },
+    );
   }
   const invite = await prisma.invite.findUnique({ where: { token } });
   if (!invite || invite.acceptedAt || invite.expiresAt < new Date()) {

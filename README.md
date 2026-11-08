@@ -1,14 +1,38 @@
 # AgencyOps
 
-AI staff for an independent insurance agency. Each bot has a chat, a phone and email identity, a budget, and a computer pane. Outbound texts, emails, calls, and certificate files stay drafts until a person approves them. Bots never give coverage advice or bind a policy.
+AI staff for an independent insurance agency. Six bots share one night desk: a sidebar of people, a chat for each, and that bot's computer. Nothing a customer would receive goes out until a person at the agency approves it. Bots never give coverage advice and never bind a policy.
 
-The demo workspace is **Rivera Insurance**: Penny (front desk), Ivy (inbox), Quinn (quotes), Reed (renewals), Sage (service desk), and Gale (growth).
+This repository is an open-source showcase of the kind of desk [Charles Connelly](#custom-version) builds for a client. The workspace you get from the seed is fictional: **Rivera Insurance**. It is not a real agency, and the phone numbers are 555 numbers.
 
-This is an original app. It does not include code from Orgo, BOPS, or other agent platforms.
+Licensed under the MIT license. Copyright 2026 Charles Connelly. See [LICENSE](LICENSE).
 
-## Run locally (no keys)
+![The six bots](docs/screenshots/12-avatars.png)
 
-Mock mode is the default. No Twilio, AgentMail, Anthropic, or OpenAI key is required.
+## What you can click through
+
+| | |
+|---|---|
+| Home | ![Home](docs/screenshots/01-home.png) |
+| Chat, with a text waiting for approval | ![Chat](docs/screenshots/02-chat.png) |
+| Certificate approval and Sage's computer | ![Approvals](docs/screenshots/04-approval-computer.png) |
+| Phone on a small screen | ![Mobile](docs/screenshots/10-mobile.png) |
+
+Penny (front desk), Ivy (inbox), Quinn (quotes), Reed (renewals), Sage (service desk), and Gale (growth) are the seeded team. Each face is the same circle and oval eyes, with one small habit of its own.
+
+## Features
+
+- One agency, many bots. Each bot has a role prompt, memory notes you can edit, channels, and a monthly spend cap.
+- Chat with a real model when `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set. With no key, a built-in mock answers so the demo still runs.
+- Approvals. SMS, email, outbound calls, and certificate files are drafts. Approve, edit, or decline. The audit log records the decision.
+- Budgets. Per-bot and workspace caps. Hitting a cap is a hard stop.
+- A computer pane for what the bot is doing. A virtual desktop can plug in later. v1 draws the activity locally.
+- Connectors for Gmail, calendar, Slack, AMS360, HawkSoft, and Composio. They are stubs until you add keys.
+- Brand settings (name, mark, accent) and a layout that works on a phone.
+- Sign-in for an owner, plus staff invites.
+
+## Mock-mode quickstart
+
+No API keys. The default channel mode never dials or sends.
 
 ```bash
 npm install
@@ -18,17 +42,18 @@ npm run db:seed
 npm run dev
 ```
 
-Open [http://127.0.0.1:43123](http://127.0.0.1:43123).
+Open http://127.0.0.1:43123
 
-- Marketing site: `/`
-- Sign in: `rosa@rivera.insurance` / `rivera-demo`
-- Staff invite (already seeded): `/invite/staff-demo-token`
+**Demo only.** These credentials are published in this repo. They are not a private password.
 
-The home desk opens on Reed's Hill Bakery renewal. Penny is on a live intake with Dana Chen and has an SMS waiting. Approve it from her chat. Nothing is delivered outside the app while `CHANNEL_MODE=mock`.
+- Owner: `rosa@rivera.insurance` / `rivera-demo`
+- Staff invite: `/invite/staff-demo-token`
 
-Replay the call from the **RC** menu: **Replay Dana's call**. That runs Penny's agent loop again (mock model, or a real model if a key is set), drafts a new SMS, and waits.
+Production (`NODE_ENV=production`) rejects that login, that invite token, and `npm run db:seed` unless you set `DEMO_MODE=true`. Use that flag only if this deploy is the public showcase. For a private install, seed once with `DEMO_MODE=true`, change the owner's password, then unset `DEMO_MODE`. The published password stops working. A different password on that account still works.
 
-### Simulate another inbound
+The home desk opens on Reed's Hill Bakery renewal. Penny is on a live intake with Dana Chen and has a text waiting. Replay it from the **RC** menu: **Replay Dana's call**.
+
+Simulate another inbound (local default secret is `demo`):
 
 ```bash
 curl -s -X POST http://127.0.0.1:43123/api/webhooks/inbound \
@@ -37,37 +62,63 @@ curl -s -X POST http://127.0.0.1:43123/api/webhooks/inbound \
   -d '{"agencySlug":"rivera","channel":"call","to":"+13035550142","from":"+17205550198","contactName":"Dana Chen","body":"Hi, I need a quote on a 2024 RAV4, zip 80205."}'
 ```
 
-`channel` can be `call`, `sms`, or `email`. The `to` number or address picks the bot.
+## Environment
 
-## Real model
+Copy `.env.example`. Every key is listed there.
 
-Set one key and leave `LLM_PROVIDER=auto`.
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | SQLite file locally (`file:./dev.db`). Use a persistent disk or Postgres in production. |
+| `AUTH_SECRET` | Signs the session cookie. In production this must be a unique value from the environment, at least 24 characters. Placeholders are rejected. There is no production fallback. |
+| `DEMO_MODE` | `true` allows the published demo login, invite, seed, and the webhook secret `demo` in production. Leave empty for a client deploy. |
+| `APP_URL` | Public URL, used for invite links. |
+| `LLM_PROVIDER` | `auto` (default), `anthropic`, `openai`, or `mock`. |
+| `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Optional. `auto` uses Anthropic when this key is set. |
+| `OPENAI_API_KEY`, `OPENAI_MODEL` | Optional. Used when Anthropic is unset. |
+| `CHANNEL_MODE` | `mock` (default) or `live`. |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Live SMS after approval. |
+| `AGENTMAIL_API_KEY`, `AGENTMAIL_INBOX_ID` | Live email after approval. |
+| `AGENTPHONE_API_KEY`, `AGENTPHONE_BASE_URL` | Optional phone adapter. |
+| `DEMO_WEBHOOK_SECRET` | Inbound webhook. The local value `demo` is rejected in production unless `DEMO_MODE=true`. |
+| `COMPUTER_PROVIDER` | `stub` or `orgo`. v1 always draws the local desktop. |
+| `HAWKSOFT_API_KEY`, `HAWKSOFT_AGENCY_ID`, `AMS360_APP_KEY`, `COMPOSIO_API_KEY` | Connector stubs. Blank stays in sandbox. |
+
+## Deploy
+
+The SQLite file has to live on a persistent disk. Vercel serverless will not keep it. Fly and Render will, if you attach a volume. You can also switch the Prisma datasource to Postgres and run a migration.
+
+Do not set `DEMO_MODE` on a client deployment you do not want strangers to sign into with the password in this README.
+
+### Fly
+
+`Dockerfile` and `fly.toml` are included. Create a volume at `/data`.
 
 ```bash
-ANTHROPIC_API_KEY=sk-ant-...
-# or
-OPENAI_API_KEY=sk-...
-LLM_PROVIDER=auto
+fly secrets set \
+  AUTH_SECRET="$(openssl rand -base64 32)" \
+  DATABASE_URL="file:/data/agencyops.db" \
+  APP_URL="https://your-app.fly.dev" \
+  DEMO_WEBHOOK_SECRET="$(openssl rand -base64 32)"
+fly deploy
 ```
 
-`auto` prefers Anthropic, then OpenAI, then the built-in mock. Force a provider with `LLM_PROVIDER=anthropic`, `openai`, or `mock`.
-
-The agent still has no send tool. Draft tools create approvals. A guardrail replaces coverage advice and binding language before it is stored.
-
-## Real channels
-
-Keep `CHANNEL_MODE=mock` until you mean to send.
+To load the showcase data on that machine:
 
 ```bash
-CHANNEL_MODE=live
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_FROM_NUMBER=
-AGENTMAIL_API_KEY=
-AGENTMAIL_INBOX_ID=
+fly ssh console -C "NODE_ENV=production DEMO_MODE=true npx tsx prisma/seed.ts"
 ```
 
-Approved SMS goes to Twilio. Approved email goes to AgentMail (`POST /v0/inboxes/{inbox_id}/messages/send`). AgentPhone is optional: set `AGENTPHONE_API_KEY` and `AGENTPHONE_BASE_URL` when you want that adapter instead. With the mode on `mock`, those keys are ignored and the audit log records a sandbox receipt.
+Then change the owner password and remove `DEMO_MODE` if the published password should stop working.
+
+### Render
+
+Web service, Node, disk mounted at `/data`.
+
+- Build: `npm install && npx prisma generate && npm run build`
+- Start: `npx prisma migrate deploy && npm run start`
+- `DATABASE_URL=file:/data/agencyops.db`
+- `AUTH_SECRET` from the environment, not the example file
+- Render sets `PORT`. The start script listens on it.
 
 ## Checks
 
@@ -77,41 +128,16 @@ npm run typecheck
 npm run lint
 ```
 
-Tests cover the approval gate (pending, draft, and rejected never send; approved does) and the budget hard stop (a bot or the workspace at its cap does not call the model).
+Tests cover the approval gate, the budget cap, and the production lock on the demo login.
 
-## Data model
+## Custom version
 
-One SQLite file in local dev (`prisma/dev.db`). Agency → users, bots, threads, messages, approvals, tasks, calls, usage, audit, connectors, vault labels. Vault rows store a label and `secretRef: keychain`. Passwords are not saved.
+AgencyOps is the showcase. Charles Connelly builds a branded desk like this for one business: their name, their bots, their approvals.
 
-Caps are monthly, in cents. Penny's demo cap is $120. The workspace cap is $500. Crossing a cap pauses the bot with a hard stop. The usage page shows the month.
+TODO: replace this line with a public email or booking link before announcing the repo.
 
-## Deploy
+## Project notes
 
-The filesystem on a host has to keep the SQLite file. Vercel serverless will not. Use Fly or Render with a persistent disk, or point `DATABASE_URL` at Postgres by changing the Prisma datasource provider to `postgresql`, running `prisma migrate dev`, and deploying that migration.
+Original code. It does not include Orgo, BOPS, or any other agent platform's source.
 
-### Fly
-
-`fly.toml` and `Dockerfile` are in the repo. Create a volume mounted at `/data` and set:
-
-```bash
-fly secrets set AUTH_SECRET=... DATABASE_URL=file:/data/agencyops.db APP_URL=https://your-app.fly.dev
-fly deploy
-fly ssh console -C "npx tsx --env-file=.env prisma/seed.ts"
-```
-
-Seed once. It wipes and rebuilds the demo agency.
-
-### Render
-
-Web service, Node, persistent disk mounted at `/data`.
-
-- Build: `npm install && npx prisma generate && npm run build`
-- Start: `npx prisma migrate deploy && npm run start`
-- `DATABASE_URL=file:/data/agencyops.db`
-- `PORT` is provided by Render. The start script listens on `$PORT`.
-
-Then run `npm run db:seed` from the shell once.
-
-## Environment
-
-Every key is listed in `.env.example`. Blank keys stay in sandbox. `COMPUTER_PROVIDER=stub` renders the activity desktop in the app. `orgo` selects the same adapter interface for a later virtual desktop and does not call out.
+Contributing: [CONTRIBUTING.md](CONTRIBUTING.md). Security: [SECURITY.md](SECURITY.md).

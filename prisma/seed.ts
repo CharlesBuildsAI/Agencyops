@@ -1,7 +1,20 @@
+/**
+ * DEMO DATA ONLY. Rivera Insurance, rosa@rivera.insurance / rivera-demo,
+ * and the invite token staff-demo-token are fictional showcase credentials.
+ * This script refuses to run when NODE_ENV=production unless DEMO_MODE=true.
+ */
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { runDanaDemo } from "../src/lib/demo";
+import { allowDemoCredentials } from "../src/lib/demo-mode";
 import { dayKey, monthKey } from "../src/lib/time";
+
+if (!allowDemoCredentials()) {
+  console.error(
+    "Refusing to seed the Rivera demo in production. Set DEMO_MODE=true only for a public showcase, then change the owner password and turn DEMO_MODE off.",
+  );
+  process.exit(1);
+}
 
 const prisma = new PrismaClient();
 const TZ = "America/Denver";
@@ -25,6 +38,7 @@ async function main() {
   const month = monthKey(now, TZ);
   const today = dayKey(now, TZ);
   const year = today.slice(0, 4);
+  // Published demo password. Login with this pair is rejected in production unless DEMO_MODE=true.
   const passwordHash = await bcrypt.hash("rivera-demo", 10);
 
   const agency = await prisma.agency.create({

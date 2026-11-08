@@ -34,12 +34,16 @@ yarn-error.log*
 .env*
 !.env.example
 
-# sqlite
+# databases and local disks
 /prisma/dev.db
 /prisma/dev.db-journal
 /data/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
 
-# local source drops
+# local source drops and private uploads
 /uploads/
 
 # vercel

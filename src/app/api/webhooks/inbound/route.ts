@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { bad } from "@/lib/http";
+import { webhookAuthorized } from "@/lib/demo-mode";
 import { ingestInbound, type InboundInput } from "@/lib/inbound";
 
 export async function POST(request: Request) {
-  const expected = process.env.DEMO_WEBHOOK_SECRET;
-  const header = request.headers.get("x-agencyops-secret");
-  const allowed = expected ? header === expected : process.env.NODE_ENV !== "production" && header === "demo";
-  if (!allowed) return bad("Webhook secret rejected.", 401);
+  if (!webhookAuthorized(request.headers.get("x-agencyops-secret"))) {
+    return bad("Webhook secret rejected.", 401);
+  }
   const body = (await request.json().catch(() => null)) as (InboundInput & { agencySlug?: string }) | null;
   if (!body?.agencySlug || !body.channel || !body.to || !body.from || !body.body) {
     return bad("agencySlug, channel, to, from, and body are required.");
