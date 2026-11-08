@@ -102,7 +102,7 @@ button { cursor: pointer; }
 .mobile-title { display: none; margin: 8px 10px 12px; font-size: 34px; letter-spacing: -0.045em; font-weight: 600; }
 .team-list { list-style: none; margin: 0; padding: 0; overflow: auto; flex: 1; }
 .team-row {
-  display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center;
   padding: 8px 8px; border-radius: 14px; margin-bottom: 2px;
 }
 .team-row:hover { background: rgba(255,255,255,0.03); }
@@ -361,6 +361,14 @@ textarea.field { height: auto; padding: 10px 12px; }
 .dialog h2 { margin: 0 0 8px; letter-spacing: -0.03em; }
 .dialog p { color: var(--muted); margin: 0 0 12px; }
 
+.lineup { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.lineup-card { text-align: center; padding: 8px 4px 14px; }
+.lineup-card h2 { margin: 10px 0 0; font-size: 16px; letter-spacing: -0.03em; }
+.lineup-card p { margin: 2px 0 12px; color: var(--faint); font-size: 12px; }
+.lineup-card .bot-avatar { margin: 0 auto; }
+.lineup-states { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 4px; margin-top: 4px; }
+.lineup-states figure { margin: 0; }
+.lineup-states figcaption { color: var(--faint); font-size: 10px; letter-spacing: 0.04em; margin-top: 4px; }
 .settings-list { display: grid; gap: 8px; max-width: 520px; }
 .settings-list a, .call-list a {
   display: flex; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 14px;
@@ -384,7 +392,7 @@ textarea.field { height: auto; padding: 10px 12px; }
   .back-link { display: inline-flex; }
   .side-foot { display: none; }
   .home { padding: 22px 18px; }
-  .stats, .brand-grid, .profile-wrap { display: block; }
+  .stats, .brand-grid, .profile-wrap, .lineup { display: block; }
   .profile-side { width: auto; }
   .tabbar {
     display: flex; position: fixed; z-index: 10; left: 12px; right: 12px; bottom: 12px; height: 62px;
@@ -396,8 +404,43 @@ textarea.field { height: auto; padding: 10px 12px; }
   .page { padding: 22px 16px 32px; }
 }
 
+.avatar-slot { display: inline-flex; flex: none; line-height: 0; }
+.bot-avatar { display: block; overflow: visible; }
+.bot-avatar .bob { transform-box: fill-box; transform-origin: center; }
+.bot-avatar .eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: avatar-blink var(--blink, 6.2s) ease-in-out infinite;
+  animation-delay: var(--blink-delay, 0s);
+}
+.bot-avatar.blink-double .eye { animation-name: avatar-blink-double; }
+.bot-avatar .eyes { transform-box: fill-box; transform-origin: center; }
+.bot-avatar .cheek { opacity: 0; }
+.bot-avatar.mood-working .bob { animation: avatar-bob 2.7s ease-in-out infinite; }
+.bot-avatar.mood-glance .eyes { transform: translate(7%, 8%); }
+.bot-avatar.mood-happy .eye { animation: none; transform: scaleY(0.28); }
+.bot-avatar.mood-happy .cheek { opacity: 0.55; }
+@keyframes avatar-blink {
+  0%, 88%, 100% { transform: scaleY(1); }
+  93% { transform: scaleY(0.08); }
+}
+@keyframes avatar-blink-double {
+  0%, 78%, 100% { transform: scaleY(1); }
+  82% { transform: scaleY(0.1); }
+  86% { transform: scaleY(1); }
+  91% { transform: scaleY(0.1); }
+}
+@keyframes avatar-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5%); }
+}
+
 nextjs-portal { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .wave i { animation: none; height: 8px; }
+  .bot-avatar .eye,
+  .bot-avatar .bob,
+  .bot-avatar.mood-working .bob { animation: none; }
+  .bot-avatar.mood-happy .eye { transform: scaleY(0.28); }
 }

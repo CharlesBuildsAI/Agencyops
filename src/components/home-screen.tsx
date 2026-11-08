@@ -1,4 +1,4 @@
-import { Blob } from "./blob";
+import { BotAvatar } from "./bot-avatar";
 import { ButtonLink } from "./ui/button";
 
 export function HomeScreen({
@@ -13,6 +13,7 @@ export function HomeScreen({
     focusLabel: string;
     queue: {
       id: string;
+      slug: string;
       color: string;
       title: string;
       detail: string;
@@ -47,7 +48,7 @@ export function HomeScreen({
         {home.queue.length === 0 && <p className="faint" style={{ padding: "0 8px" }}>Nothing is waiting.</p>}
         {home.queue.map((item) => (
           <a className="q-item" key={item.id} href={item.href}>
-            <Blob color={item.color} size={32} />
+            <BotAvatar slug={item.slug} color={item.color} size={30} mood={item.action === "Listen" ? "working" : "idle"} />
             <span>
               <b>{item.title}</b>
               <p>{item.detail}</p>

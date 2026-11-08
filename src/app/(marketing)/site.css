@@ -79,6 +79,12 @@ section{position:relative}
 .bots{list-style:none;display:grid;grid-template-columns:1fr 1fr 1fr;column-gap:48px;border-top:1px solid var(--line)}
 .bots li{display:flex;gap:16px;align-items:center;padding:24px 0;border-bottom:1px solid var(--line)}
 .face{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(232,236,244,.05);flex-shrink:0}
+.face .bot-avatar{display:block;overflow:visible}
+.face .eye{transform-box:fill-box;transform-origin:center;animation:face-blink var(--blink,6s) ease-in-out infinite;animation-delay:var(--blink-delay,0s)}
+.face .blink-double .eye{animation-name:face-blink-double}
+@keyframes face-blink{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(.08)}}
+@keyframes face-blink-double{0%,78%,100%{transform:scaleY(1)}82%{transform:scaleY(.1)}86%{transform:scaleY(1)}91%{transform:scaleY(.1)}}
+@media (prefers-reduced-motion:reduce){.face .eye{animation:none}}
 .bots h3{font-size:18px;letter-spacing:-.02em;line-height:1.2}
 .bots .role{font-weight:450;color:var(--faint);font-size:14px;letter-spacing:0;margin-left:4px}
 .bots p{font-size:14.5px;color:var(--muted);margin-top:2px}

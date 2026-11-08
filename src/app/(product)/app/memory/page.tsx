@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Blob } from "@/components/blob";
+import { BotAvatar } from "@/components/bot-avatar";
 import { MemoryForm } from "@/components/editors";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -16,7 +16,7 @@ export default async function MemoryPage() {
         {bots.map((bot) => (
           <article key={bot.id} className="sheet" style={{ padding: 16 }}>
             <div className="row" style={{ gap: 10, marginBottom: 10 }}>
-              <Blob color={bot.color} size={28} />
+              <BotAvatar slug={bot.slug} color={bot.color} size={28} />
               <b>{bot.name}</b>
               <span className="faint">{bot.roleTitle}</span>
             </div>

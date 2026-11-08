@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { Blob } from "@/components/blob";
+import { BotAvatar } from "@/components/bot-avatar";
 import { PauseButton } from "@/components/editors";
 import { requireUser } from "@/lib/auth";
 import { loadDesk } from "@/lib/view";
@@ -15,14 +15,14 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
     <div className="profile-wrap">
       <section className="panel profile-mid">
         <div style={{ textAlign: "center" }}>
-          <Blob color={desk.bot.color} size={42} />
+          <BotAvatar slug={desk.bot.slug} color={desk.bot.color} size={148} mood={desk.call ? "working" : "idle"} />
           <p style={{ marginTop: 12 }}>Chat with {desk.bot.name}</p>
           <a className="btn btn-ghost btn-sm" href={`/app/bots/${desk.bot.slug}`} style={{ marginTop: 12 }}>Open chat</a>
         </div>
       </section>
       <aside className="panel profile-side">
         <header className="chat-head" style={{ paddingLeft: 0 }}>
-          <Blob color={desk.bot.color} size={42} />
+          <BotAvatar slug={desk.bot.slug} color={desk.bot.color} size={48} mood={desk.call ? "working" : "idle"} />
           <div className="head-copy">
             <b>{desk.bot.name}</b>
             <span>{desk.bot.roleTitle} · Rivera Insurance</span>

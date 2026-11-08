@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Blob } from "./blob";
+import { BotAvatar } from "./bot-avatar";
 import { StarField, Wave } from "./starfield";
 import { formatDuration } from "@/lib/time";
 import type { ApprovalCardData } from "./approval-card";
@@ -80,7 +80,7 @@ export function ComputerPane({
           <div className="call-hero">
             <StarField />
             <svg className="moon-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d7deea" strokeWidth="1.5"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5Z" /></svg>
-            <Blob color={color} size={72} />
+            <BotAvatar color={color} plain size={84} mood="working" label={call.contactName} />
             <h2>{call.contactName}</h2>
             <p className="faint mono">{formatDuration(call.startedAt, now)} · mobile</p>
             <div style={{ marginTop: 12 }}><Wave hot /></div>

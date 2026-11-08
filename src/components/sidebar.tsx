@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Blob } from "./blob";
+import { BotAvatar } from "./bot-avatar";
 import { Dialog } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -105,7 +105,7 @@ export function Sidebar({ frame }: { frame: FrameData }) {
           return (
             <li key={bot.slug}>
               <a className={active ? "team-row active" : `team-row${bot.paused ? " paused" : ""}`} href={`/app/bots/${bot.slug}`}>
-                <Blob color={bot.color} />
+                <BotAvatar slug={bot.slug} color={bot.color} size={28} mood={bot.live ? "working" : "idle"} />
                 <span className="who">
                   <span className="who-top"><b>{bot.name}</b><i>{bot.roleTitle}</i></span>
                   <span className="who-sub">{bot.statusLine}</span>

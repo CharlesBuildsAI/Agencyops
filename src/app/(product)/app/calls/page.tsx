@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Blob } from "@/components/blob";
+import { BotAvatar } from "@/components/bot-avatar";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -22,13 +22,13 @@ export default async function CallsPage() {
       <div className="call-list" style={{ display: "grid", gap: 8 }}>
         {live.map((call) => (
           <a key={call.id} href={`/app/bots/${call.bot.slug}/call`}>
-            <span className="row" style={{ gap: 10 }}><Blob color={call.bot.color} size={28} /><span><b>{call.bot.name} · {call.contactName}</b><small className="faint" style={{ display: "block" }}>{call.summary}</small></span></span>
+            <span className="row" style={{ gap: 10 }}><BotAvatar slug={call.bot.slug} color={call.bot.color} size={28} mood={call.status === "live" ? "working" : "idle"} /><span><b>{call.bot.name} · {call.contactName}</b><small className="faint" style={{ display: "block" }}>{call.summary}</small></span></span>
             <span className="pill pill-needs">Live</span>
           </a>
         ))}
         {recent.map((call) => (
           <a key={call.id} href={`/app/bots/${call.bot.slug}`}>
-            <span className="row" style={{ gap: 10 }}><Blob color={call.bot.color} size={28} /><span><b>{call.contactName}</b><small className="faint" style={{ display: "block" }}>{call.bot.name} · ended</small></span></span>
+            <span className="row" style={{ gap: 10 }}><BotAvatar slug={call.bot.slug} color={call.bot.color} size={28} mood={call.status === "live" ? "working" : "idle"} /><span><b>{call.contactName}</b><small className="faint" style={{ display: "block" }}>{call.bot.name} · ended</small></span></span>
           </a>
         ))}
       </div>

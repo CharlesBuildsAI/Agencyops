@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ApprovalCard, type ApprovalCardData } from "./approval-card";
 import { ComputerPane } from "./computer-pane";
-import { Blob } from "./blob";
+import { BotAvatar } from "./bot-avatar";
+import type { AvatarMood } from "@/lib/avatars";
 import { Wave } from "./starfield";
 import { formatDuration } from "@/lib/time";
 
@@ -27,6 +28,19 @@ export function ChatScreen({ desk }: { desk: Desk }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const [celebrate, setCelebrate] = useState(false);
+  const approved = desk.approvals.filter((item) => item.status === "approved").length;
+  const seenApproved = useRef(approved);
+  useEffect(() => {
+    if (approved > seenApproved.current) {
+      setCelebrate(true);
+      const timer = setTimeout(() => setCelebrate(false), 2400);
+      seenApproved.current = approved;
+      return () => clearTimeout(timer);
+    }
+    seenApproved.current = approved;
+  }, [approved]);
+  const mood: AvatarMood = celebrate ? "happy" : text.trim() ? "glance" : desk.call || busy ? "working" : "idle";
   useEffect(() => {
     if (!desk.call) return;
     const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -72,7 +86,7 @@ export function ChatScreen({ desk }: { desk: Desk }) {
       <section className="panel chat-panel grow">
         <header className="chat-head">
           <a className="back-link" href="/app">Back</a>
-          <Blob color={desk.bot.color} size={34} />
+          <BotAvatar slug={desk.bot.slug} color={desk.bot.color} size={36} mood={mood} />
           <div className="head-copy">
             <b><a href={`/app/bots/${desk.bot.slug}/profile`}>{desk.bot.name}</a></b>
             <span>{desk.call ? `On a call · ${desk.call.contactName}` : desk.bot.roleTitle}</span>

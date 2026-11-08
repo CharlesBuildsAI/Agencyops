@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Blob } from "./blob";
+import { BotAvatar } from "./bot-avatar";
 import { StarField, Wave } from "./starfield";
 import { formatDuration } from "@/lib/time";
 
@@ -34,7 +34,7 @@ export function CallScreen({
       <StarField />
       <svg className="moon-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d7deea" strokeWidth="1.5"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5Z" /></svg>
       <header className="chat-head" style={{ position: "relative", zIndex: 1, justifyContent: "center" }}>
-        <Blob color={bot.color} size={28} />
+        <BotAvatar slug={bot.slug} color={bot.color} size={28} mood={call ? "working" : "idle"} />
         <div className="head-copy" style={{ flex: "none" }}>
           <b>{bot.name}</b>
           <span>{call ? "Live" : bot.roleTitle}</span>
@@ -48,14 +48,14 @@ export function CallScreen({
       <div className="call-hero">
         {call ? (
           <>
-            <Blob color={bot.color} size={112} />
+            <BotAvatar slug={bot.slug} color={bot.color} size={120} mood="working" />
             <h2>{bot.name}</h2>
             <p className="faint">FaceTime Audio · {formatDuration(call.startedAt, now)}</p>
             <p className="muted" style={{ maxWidth: 420 }}>{call.summary}</p>
           </>
         ) : (
           <>
-            <Blob color={bot.color} size={112} />
+            <BotAvatar slug={bot.slug} color={bot.color} size={120} />
             <h2>{bot.name}</h2>
             <p className="muted">The line is quiet. Inbound calls show up here.</p>
           </>

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Blob } from "@/components/blob";
+import { BotAvatar } from "@/components/bot-avatar";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { dollars } from "@/lib/format";
@@ -43,7 +43,7 @@ export default async function UsagePage() {
         <p className="faint" style={{ padding: "10px 4px" }}>Per bot</p>
         {bots.map((bot) => (
           <div className="bot-spend" key={bot.id}>
-            <Blob color={bot.color} size={22} />
+            <BotAvatar slug={bot.slug} color={bot.color} size={26} />
             <b style={{ width: 72 }}>{bot.name}</b>
             <div className="track meter"><span className={bot.spentCents === max ? "" : ""} style={{ width: `${(bot.spentCents / max) * 100}%`, background: bot.spentCents === max ? "var(--accent)" : undefined }} /></div>
             <span className="mono faint">{dollars(bot.spentCents)}</span>
