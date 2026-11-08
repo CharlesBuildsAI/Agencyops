@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation";
+import { AccentFollowToggle } from "@/components/accent-follow";
 import { BrandForm } from "@/components/editors";
 import { requireUser } from "@/lib/auth";
 
 const SWATCHES = [
-  { name: "moonlit text", color: "#F3F5F8" },
-  { name: "surface", color: "#2A2C33" },
-  { name: "midnight", color: "#0A0A0C" },
-  { name: "starlight", color: "#E6F08A" },
-  { name: "moon", color: "#C5D0E4" },
+  { name: "field", color: "var(--radial)" },
+  { name: "glass", color: "var(--glass)" },
+  { name: "ink", color: "var(--ink)" },
 ];
 
 export default async function BrandPage() {
@@ -16,7 +15,7 @@ export default async function BrandPage() {
   return (
     <section className="panel grow page">
       <h1>Brand</h1>
-      <p className="sub">White-label for {user.agency.name}. Highlighter still marks only what needs you.</p>
+      <p className="sub">White-label for {user.agency.name}. The field follows the clock. This accent marks buttons, pills, and the team.</p>
       <div className="brand-grid">
         <div className="sheet" style={{ padding: 16 }}>
           <h2 style={{ marginTop: 0 }}>Workspace</h2>
@@ -40,8 +39,15 @@ export default async function BrandPage() {
             {SWATCHES.map((swatch) => (
               <span key={swatch.name} className="swatch" style={{ background: swatch.color }} title={swatch.name} />
             ))}
+            <span className="swatch" style={{ background: user.agency.accentColor }} title="accent" />
           </div>
-          <p className="faint mono">moonlit text · surface · midnight · starlight · moon</p>
+          <p className="faint mono">field · glass · ink · accent {user.agency.accentColor}</p>
+          <div style={{ marginTop: 18 }}>
+            <AccentFollowToggle accent={user.agency.accentColor} />
+            <p className="faint" style={{ marginTop: 8 }}>
+              Off uses this accent for buttons, pills, focus, and the agents. On lets sunrise, day, sunset, and night choose those colors. A light accent is darkened when white type or white eyes would fail.
+            </p>
+          </div>
         </div>
       </div>
       <div className="download">

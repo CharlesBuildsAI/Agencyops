@@ -6,7 +6,13 @@ This repository is an open-source showcase of the kind of desk [Charles Connelly
 
 Licensed under the MIT license. Copyright 2026 Charles Connelly. See [LICENSE](LICENSE).
 
-The desk is frosted glass on a blue field. It follows the local clock: sunrise, day, sunset, and night, crossfading for 45 minutes. Agents stay blue in every light. Pick Auto, Sunrise, Day, Sunset, or Night in Settings, or preview with `?tod=sunset`.
+The public page and the desk share one frosted-glass field. It follows the local clock: sunrise, day, sunset, and night, crossfading for 45 minutes. Pick Auto, Sunrise, Day, Sunset, or Night in Settings, or preview with `?tod=sunset`.
+
+Buttons, pills, focus rings, and the agent circles use the agency accent. The stock yellow follows the time of day. A custom brand color takes over, and **Accent follows time of day** on the brand page hands those colors back to the clock. If a brand color would fail contrast on a theme, its lightness shifts for that theme only.
+
+![Marketing in four lights](docs/screenshots/14-marketing.png)
+
+![A green accent on the day desk](docs/screenshots/15-brand.png)
 
 ![Four themes](docs/screenshots/13-themes.png)
 
@@ -20,8 +26,9 @@ The desk is frosted glass on a blue field. It follows the local clock: sunrise, 
 | Chat, with a text waiting for approval | ![Chat](docs/screenshots/02-chat.png) |
 | Certificate approval and Sage's computer | ![Approvals](docs/screenshots/04-approval-computer.png) |
 | Phone on a small screen | ![Mobile](docs/screenshots/10-mobile.png) |
+| Marketing on a phone | ![Marketing mobile](docs/screenshots/16-marketing-mobile.png) |
 
-Penny (front desk), Ivy (inbox), Quinn (quotes), Reed (renewals), Sage (service desk), and Gale (growth) are the seeded team. Each face is a flat blue circle with white pill eyes. They blink, bob on a live call, glance while you type, and squint when a draft is approved.
+Penny (front desk), Ivy (inbox), Quinn (quotes), Reed (renewals), Sage (service desk), and Gale (growth) are the seeded team. Each face is a flat circle with white pill eyes. On the stock accent they stay blue. A brand color tints the whole team. They blink, bob on a live call, glance while you type, and squint when a draft is approved.
 
 ## Features
 
@@ -132,7 +139,7 @@ npm run typecheck
 npm run lint
 ```
 
-Tests cover the approval gate, the budget cap, and the production lock on the demo login.
+Tests cover the approval gate, the budget cap, the production lock on the demo login, and accent contrast on every theme.
 
 ## Custom version
 

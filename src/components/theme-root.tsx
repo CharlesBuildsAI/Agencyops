@@ -48,6 +48,7 @@ export function ThemeRoot({ children }: { children: React.ReactNode }) {
     const theme = resolveTheme({ date: new Date(), choice, coords, reducedMotion: reduced });
     applyTheme(theme.tokens);
     document.documentElement.dataset.theme = theme.name;
+    window.dispatchEvent(new Event("agencyops-painted"));
     document.documentElement.style.setProperty(
       "--theme-fade",
       reduced ? "0s" : "1.2s",

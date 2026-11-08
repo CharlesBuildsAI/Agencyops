@@ -81,7 +81,7 @@ export function avatarFill(slug: string | undefined, fallback: string) {
 export function avatarInner(options: { slug?: string; color: string; plain?: boolean }) {
   const face = !options.plain && options.slug ? EYES[options.slug] : undefined;
   const eyes = face?.eyes ?? PLAIN;
-  const fill = options.plain ? options.color || BOT_COLORS.penny : avatarFill(options.slug, options.color);
+  const fill = options.color || BOT_COLORS.penny;
   const marks = eyes
     .map((eye) => `<g class="eye"><ellipse cx="${eye.cx}" cy="${eye.cy}" rx="${eye.rx}" ry="${eye.ry}" fill="#fff"/></g>`)
     .join("");

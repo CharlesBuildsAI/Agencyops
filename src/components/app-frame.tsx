@@ -1,6 +1,8 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
+import { BrandAccent } from "./brand-accent";
 import { Sidebar } from "./sidebar";
 import type { FrameData } from "@/lib/view";
 
@@ -9,10 +11,14 @@ export function AppFrame({ frame, children }: { frame: FrameData; children: Reac
   const teamHome = path === "/app";
   return (
     <div className="app-root">
-      <div className={teamHome ? "app-grid show-team" : "app-grid"}>
-        <Sidebar frame={frame} />
-        <div className="stage">{children}</div>
-      </div>
+      <Suspense fallback={null}>
+        <BrandAccent accent={frame.agency.accentColor}>
+          <div className={teamHome ? "app-grid show-team" : "app-grid"}>
+            <Sidebar frame={frame} />
+            <div className="stage">{children}</div>
+          </div>
+        </BrandAccent>
+      </Suspense>
       <nav className="tabbar" aria-label="Mobile">
         <a className={path === "/app" ? "on" : ""} href="/app">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><circle cx="12" cy="8" r="3" /><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19" /></svg>
