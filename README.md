@@ -145,7 +145,7 @@ Tests cover the approval gate, the budget cap, the production lock on the demo l
 
 AgencyOps is the showcase. Charles Connelly builds a branded desk like this for one business: their name, their bots, their approvals.
 
-TODO: replace this line with a public email or booking link before announcing the repo.
+Email [lovelandseeker@gmail.com](mailto:lovelandseeker@gmail.com).
 
 ## Project notes
 

@@ -4,7 +4,7 @@ AgencyOps is a showcase. Do not point it at a real book of business until you ha
 
 ## Reporting
 
-TODO: replace this line with a private contact (email or security form) before announcing the repo. Until then, open a GitHub security advisory if the host supports it, and do not file a public issue for a vulnerability.
+Report vulnerabilities privately to [lovelandseeker@gmail.com](mailto:lovelandseeker@gmail.com). Do not open a public issue for a vulnerability.
 
 ## What the app already refuses
 
