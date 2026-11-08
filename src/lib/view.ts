@@ -14,6 +14,8 @@ export type FrameData = {
     timezone: string;
   };
   user: { name: string; email: string; role: string; initials: string };
+  needsCount: number;
+  needsHref: string;
   bots: {
     slug: string;
     name: string;
@@ -45,6 +47,14 @@ export async function loadFrame(user: Member): Promise<FrameData> {
   });
   const pendingMap = new Map(pending.map((row) => [row.botId, row._count._all]));
   const liveSet = new Set(live.map((row) => row.botId));
+  const needs = await prisma.approval.findFirst({
+    where: { agencyId: user.agencyId, status: "pending" },
+    include: { bot: true },
+    orderBy: { createdAt: "asc" },
+  });
+  const needsCount = await prisma.approval.count({
+    where: { agencyId: user.agencyId, status: "pending" },
+  });
   return {
     agency: {
       name: user.agency.name,
@@ -59,6 +69,8 @@ export async function loadFrame(user: Member): Promise<FrameData> {
       role: user.role,
       initials: initials(user.name),
     },
+    needsCount,
+    needsHref: needs ? `/app/bots/${needs.bot.slug}` : "/app",
     bots: bots.map((bot) => ({
       slug: bot.slug,
       name: bot.name,
@@ -136,7 +148,7 @@ export async function loadHome(agencyId: string) {
   const focusHref = renewal ? `/app/bots/${renewal.bot.slug}` : queue[0]?.href ?? "/app";
   return {
     kicker: `Today · ${agency.name}`,
-    title: renewal ? "One renewal needs you." : pending.length ? `${pending.length} things need you.` : "Everyone is moving.",
+    title: pending.length >= 2 ? "Two quick approvals." : renewal ? "One renewal needs you." : pending.length ? `${pending.length} things need you.` : "Everyone is moving.",
     titleRest: renewal || pending.length ? "Everything else is moving." : "Nothing is waiting.",
     body: renewal
       ? `${renewal.bot.name} drafted the Hill Bakery outreach. Approve the SMS and he sends it from his number.`

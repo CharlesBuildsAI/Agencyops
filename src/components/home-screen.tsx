@@ -33,7 +33,7 @@ export function HomeScreen({
         <div className="actions">
           <ButtonLink href={home.focusHref}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m5 12 5 5L20 7" /></svg>
-            Review approval
+            {home.title.startsWith("One renewal") || home.focusLabel.startsWith("Open") ? "Review renewal" : "Review approval"}
           </ButtonLink>
           <ButtonLink variant="ghost" href={home.focusHref}>{home.focusLabel}</ButtonLink>
         </div>

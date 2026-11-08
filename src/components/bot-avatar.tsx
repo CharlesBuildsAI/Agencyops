@@ -1,6 +1,6 @@
 "use client";
 
-import { avatarInner, avatarTiming, type AvatarMood } from "@/lib/avatars";
+import { avatarFill, avatarInner, avatarTiming, type AvatarMood } from "@/lib/avatars";
 
 export function BotAvatar({
   slug,
@@ -20,6 +20,7 @@ export function BotAvatar({
   const timing = avatarTiming(plain ? undefined : slug);
   const who = plain ? "plain" : slug || "plain";
   const labelled = label ? ` role="img" aria-label="${label.replace(/"/g, "")}"` : ` aria-hidden="true"`;
-  const svg = `<svg class="bot-avatar mood-${mood} who-${who}${timing.double ? " blink-double" : ""}" width="${size}" height="${size}" viewBox="0 0 64 64"${labelled} style="--blink:${timing.blink};--blink-delay:${timing.delay}">${avatarInner({ slug, color, plain })}</svg>`;
+  const fill = plain ? color : avatarFill(slug, color);
+  const svg = `<svg class="bot-avatar mood-${mood} who-${who}" width="${size}" height="${size}" viewBox="0 0 64 64"${labelled} style="--blink:${timing.blink};--blink-delay:${timing.delay}">${avatarInner({ slug, color: fill, plain })}</svg>`;
   return <span className="avatar-slot" style={{ width: size, height: size }} dangerouslySetInnerHTML={{ __html: svg }} />;
 }

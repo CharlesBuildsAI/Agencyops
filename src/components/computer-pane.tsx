@@ -11,6 +11,7 @@ type Call = { id: string; contactName: string; phone: string; summary: string; s
 
 export function ComputerPane({
   name,
+  slug,
   color,
   screens,
   initial,
@@ -20,6 +21,7 @@ export function ComputerPane({
   file,
 }: {
   name: string;
+  slug?: string;
   color: string;
   screens: Screen[];
   initial: string;
@@ -80,7 +82,7 @@ export function ComputerPane({
           <div className="call-hero">
             <StarField />
             <svg className="moon-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d7deea" strokeWidth="1.5"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5Z" /></svg>
-            <BotAvatar color={color} plain size={84} mood="working" label={call.contactName} />
+            <BotAvatar slug={slug} color={color} size={84} mood="working" label={call.contactName} />
             <h2>{call.contactName}</h2>
             <p className="faint mono">{formatDuration(call.startedAt, now)} · mobile</p>
             <div style={{ marginTop: 12 }}><Wave hot /></div>

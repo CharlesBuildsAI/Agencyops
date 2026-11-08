@@ -99,7 +99,7 @@ export function ApprovalCard({ approval, slug }: { approval: ApprovalCardData; s
           ) : (
             <Button size="sm" onClick={() => act("approve")} disabled={busy}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m5 12 5 5L20 7" /></svg>
-              Approve
+              {approval.kind === "sms" ? "Approve SMS" : "Approve"}
             </Button>
           )}
           {approval.kind !== "file" && approval.kind !== "email" && (

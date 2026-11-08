@@ -6,6 +6,10 @@ This repository is an open-source showcase of the kind of desk [Charles Connelly
 
 Licensed under the MIT license. Copyright 2026 Charles Connelly. See [LICENSE](LICENSE).
 
+The desk is frosted glass on a blue field. It follows the local clock: sunrise, day, sunset, and night, crossfading for 45 minutes. Agents stay blue in every light. Pick Auto, Sunrise, Day, Sunset, or Night in Settings, or preview with `?tod=sunset`.
+
+![Four themes](docs/screenshots/13-themes.png)
+
 ![The six bots](docs/screenshots/12-avatars.png)
 
 ## What you can click through
@@ -17,7 +21,7 @@ Licensed under the MIT license. Copyright 2026 Charles Connelly. See [LICENSE](L
 | Certificate approval and Sage's computer | ![Approvals](docs/screenshots/04-approval-computer.png) |
 | Phone on a small screen | ![Mobile](docs/screenshots/10-mobile.png) |
 
-Penny (front desk), Ivy (inbox), Quinn (quotes), Reed (renewals), Sage (service desk), and Gale (growth) are the seeded team. Each face is the same circle and oval eyes, with one small habit of its own.
+Penny (front desk), Ivy (inbox), Quinn (quotes), Reed (renewals), Sage (service desk), and Gale (growth) are the seeded team. Each face is a flat blue circle with white pill eyes. They blink, bob on a live call, glance while you type, and squint when a draft is approved.
 
 ## Features
 

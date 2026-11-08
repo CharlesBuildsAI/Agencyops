@@ -76,19 +76,23 @@ export function Sidebar({ frame }: { frame: FrameData }) {
             <em>{frame.agency.name}</em>
           </span>
         </a>
-        <a className="icon-btn" href="/app" aria-label="Today">
+        <a className="icon-btn mobile-only" href="/app/settings" aria-label="Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
             <path d="M12 20h9" />
             <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
           </svg>
         </a>
       </div>
+      <a className="needs-row" href={frame.needsHref}>
+        <span>Needs you</span>
+        <span className="badge">{frame.needsCount}</span>
+      </a>
       <label className="search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
         </svg>
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" aria-label="Search the team" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search team & work" aria-label="Search the team" />
       </label>
       <h1 className="mobile-title">Team</h1>
       <p className="side-label">Team</p>
@@ -120,6 +124,12 @@ export function Sidebar({ frame }: { frame: FrameData }) {
         })}
         {bots.length === 0 && <li className="faint" style={{ padding: "8px 12px" }}>No one matches.</li>}
       </ul>
+      <nav className="side-links" aria-label="Workspace">
+        <a href="/app/connectors">Connectors</a>
+        <a href="/app/usage">Usage & budgets</a>
+        <a href="/app/brand">Brand settings</a>
+        <a href="/app/settings">Light & settings</a>
+      </nav>
       <div className="side-foot">
         <a href="/app/logins">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><circle cx="8" cy="15" r="4" /><path d="m10.5 12.5 8-8 3 3-8 8" /><path d="m16 6 2 2" /></svg>

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { ThemeSettings } from "@/components/theme-settings";
 import { requireUser } from "@/lib/auth";
 
 const LINKS = [
@@ -17,6 +18,8 @@ export default async function SettingsPage() {
     <section className="panel grow page">
       <h1>Settings</h1>
       <p className="sub">{user.agency.name} · signed in as {user.name}</p>
+      <h2 className="side-label">Light</h2>
+      <ThemeSettings />
       <div className="settings-list">
         {LINKS.map(([href, label, detail]) => (
           <a key={href} href={href}><span><b>{label}</b><small className="faint" style={{ display: "block" }}>{detail}</small></span></a>

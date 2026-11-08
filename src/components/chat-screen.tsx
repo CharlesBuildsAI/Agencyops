@@ -153,6 +153,7 @@ export function ChatScreen({ desk }: { desk: Desk }) {
       </section>
       <ComputerPane
         name={desk.bot.name}
+        slug={desk.bot.slug}
         color={desk.bot.color}
         screens={desk.screens}
         initial={desk.activeScreen}
