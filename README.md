@@ -18,6 +18,14 @@ Buttons, pills, focus rings, and the agent circles use the agency accent. The st
 
 ![The six bots](docs/screenshots/12-avatars.png)
 
+## Download for Windows
+
+[![Download for Windows](https://img.shields.io/badge/Download-Windows%2010%2F11-2F62E6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/CharlesBuildsAI/Agencyops/releases/download/v0.1.0/AgencyOps-Setup-0.1.0.exe)
+
+Windows 10 or 11. The installer runs offline in demo mode: no API keys, and the Rivera login works out of the box. The same release is listed at [v0.1.0](https://github.com/CharlesBuildsAI/Agencyops/releases/tag/v0.1.0).
+
+The installer is unsigned. On the SmartScreen prompt, click **More info**, then **Run anyway**.
+
 ## What you can click through
 
 | | |
