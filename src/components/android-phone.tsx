@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { PHONE_APPS } from "@/lib/providers";
 
-type Account = { name?: string; status?: string; packageName?: string };
+type Account = { name?: string; status?: string; packageName?: string; username?: string };
 
 export function AndroidPhone({
   slug,
@@ -14,6 +14,7 @@ export function AndroidPhone({
   hasDevice,
   provider,
   accounts,
+  initialTab = "phone",
 }: {
   slug: string;
   name: string;
@@ -22,7 +23,9 @@ export function AndroidPhone({
   hasDevice: boolean;
   provider: string;
   accounts: Account[];
+  initialTab?: "phone" | "accounts";
 }) {
+  const [tab, setTab] = useState(initialTab);
   const [watching, setWatching] = useState(false);
   const [control, setControl] = useState(false);
   const [frame, setFrame] = useState(0);
@@ -32,6 +35,7 @@ export function AndroidPhone({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [app, setApp] = useState<string>(PHONE_APPS[0].packageName);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => {
     if (!watching || !hasDevice || provider !== "mobilerun") return;
@@ -45,7 +49,7 @@ export function AndroidPhone({
         return URL.createObjectURL(blob);
       });
     };
-    pull();
+    void pull();
     const timer = window.setInterval(pull, 2500);
     return () => {
       stop = true;
@@ -76,16 +80,17 @@ export function AndroidPhone({
     }
     setPassword("");
     const data = (await response.json()) as { error?: string };
-    setNotice(data.error || "Login saved for this phone. Finish signing in with Take control. No new account is created.");
+    setNotice(data.error || "Login saved in the keychain. Sign in on the phone. No new account is created.");
+    setLoginOpen(false);
     if (hasDevice) await act({ op: "open_app", packageName: app });
   }
 
-  const signed = accounts.filter((item) => item.status === "signed-in" || item.status === "saved");
-
   return (
-    <div className="phone-desk">
+    <aside className="panel computer-panel phone-pane">
+      <div className="comp-head">
+        <strong>{name}&apos;s Android phone</strong>
+      </div>
       <div className="handset">
-        <p className="handset-title">{name}&apos;s Android phone</p>
         <button
           type="button"
           className="handset-screen"
@@ -99,59 +104,83 @@ export function AndroidPhone({
           }}
         >
           {shot ? (
-            // The frame is a live device screenshot, not a static asset.
+            // Live device frame, not a static asset.
             // eslint-disable-next-line @next/next/no-img-element
             <img src={shot} alt="" />
-          ) : <DemoScreen name={name} />}
+          ) : watching ? (
+            <span className="phone-skeleton" aria-hidden><i /><i /><i /></span>
+          ) : (
+            <DemoScreen name={name} hasDevice={hasDevice} />
+          )}
         </button>
         <div className="handset-keys">
           <button type="button" className="btn btn-quiet btn-sm" onClick={() => act({ op: "key", key: "back" })}>Back</button>
           <button type="button" className="btn btn-quiet btn-sm" onClick={() => act({ op: "key", key: "home" })}>Home</button>
         </div>
       </div>
-      <div className="phone-facts">
-        <p><b>Number</b> {phone || "No carrier line yet"}</p>
-        <p><b>Email</b> {email || "No inbox yet"}</p>
-        <p><b>Signed in</b> {signed.length ? signed.map((item) => item.name).join(", ") : "No accounts yet"}</p>
-        <div className="actions">
-          <button type="button" className="btn btn-accent btn-sm" onClick={() => setWatching((value) => !value)}>{watching ? "Stop" : "Watch"}</button>
-          <button type="button" className="btn btn-quiet btn-sm" onClick={() => setControl((value) => !value)}>{control ? "Release" : "Take control"}</button>
-        </div>
-        {control && (
-          <div className="form-grid">
-            <label>Type<Input value={text} onChange={(event) => setText(event.target.value)} /></label>
-            <button type="button" className="btn btn-quiet btn-sm" onClick={() => act({ op: "type", text })}>Type on the phone</button>
-          </div>
-        )}
-        <h2>Accounts</h2>
-        <p className="muted">Sign this phone into accounts the business already has. AgencyOps does not create them.</p>
-        <ul className="account-list">
-          {PHONE_APPS.map((item) => {
-            const row = accounts.find((account) => account.packageName === item.packageName);
-            return <li key={item.packageName}><b>{item.name}</b> <span>{row?.status || "Not signed in"}</span></li>;
-          })}
-        </ul>
-        <div className="form-grid">
-          <label>App
-            <select value={app} onChange={(event) => setApp(event.target.value)}>
-              {PHONE_APPS.map((item) => <option key={item.packageName} value={item.packageName}>{item.name}</option>)}
-            </select>
-          </label>
-          <label>Username<Input value={username} onChange={(event) => setUsername(event.target.value)} /></label>
-          <label>Password<Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>
-          <button type="button" className="btn btn-quiet btn-sm" onClick={saveLogin}>Save login for the agent</button>
-        </div>
-        {notice && <p className="hint">{notice}</p>}
+      <div className="actions phone-actions">
+        <button type="button" className="btn btn-accent btn-sm" onClick={() => setWatching((value) => !value)}>{watching ? "Stop" : "Watch"}</button>
+        <button type="button" className="btn btn-quiet btn-sm" onClick={() => setControl((value) => !value)}>{control ? "Release" : "Take control"}</button>
       </div>
-    </div>
+      {control && (
+        <div className="form-grid phone-type">
+          <Input value={text} onChange={(event) => setText(event.target.value)} placeholder="Type on the phone" aria-label="Type on the phone" />
+          <button type="button" className="btn btn-quiet btn-sm" onClick={() => act({ op: "type", text })}>Type</button>
+        </div>
+      )}
+      <div className="phone-tabs">
+        <button type="button" className={tab === "phone" ? "on" : ""} onClick={() => setTab("phone")}>Line</button>
+        <button type="button" className={tab === "accounts" ? "on" : ""} onClick={() => setTab("accounts")}>Accounts</button>
+      </div>
+      {tab === "phone" ? (
+        <div className="phone-facts">
+          <p><b>Number</b> {phone || "No carrier line yet"}</p>
+          <p><b>Email</b> {email || "No inbox yet"}</p>
+        </div>
+      ) : (
+        <div className="phone-facts">
+          <table className="account-table">
+            <thead><tr><th>App</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {PHONE_APPS.map((item) => {
+                const row = accounts.find((account) => account.packageName === item.packageName);
+                return (
+                  <tr key={item.packageName}>
+                    <td>{item.name}</td>
+                    <td>{row?.status === "saved" ? `Saved · ${row.username || ""}` : "Not signed in"}</td>
+                    <td><button type="button" className="btn btn-quiet btn-sm" onClick={() => { setControl(true); void act({ op: "open_app", packageName: item.packageName }); }}>Sign in</button></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <button type="button" className="btn btn-quiet btn-sm" onClick={() => setLoginOpen((value) => !value)}>{loginOpen ? "Close" : "Save a login"}</button>
+          {loginOpen && (
+            <div className="form-grid">
+              <p className="muted">Use an account the business already has. This does not create one.</p>
+              <label>App
+                <select value={app} onChange={(event) => setApp(event.target.value)}>
+                  {PHONE_APPS.map((item) => <option key={item.packageName} value={item.packageName}>{item.name}</option>)}
+                </select>
+              </label>
+              <label>Username<Input value={username} onChange={(event) => setUsername(event.target.value)} /></label>
+              <label>Password<Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>
+              <button type="button" className="btn btn-accent btn-sm" onClick={saveLogin}>Save in the keychain</button>
+            </div>
+          )}
+        </div>
+      )}
+      {notice && <p className="hint">{notice}</p>}
+    </aside>
   );
 }
 
-function DemoScreen({ name }: { name: string }) {
+function DemoScreen({ name, hasDevice }: { name: string; hasDevice: boolean }) {
   return (
     <span className="demo-screen">
       <strong>{name}</strong>
-      <em>Demo Android phone</em>
+      <em>Android phone</em>
+      <span>{hasDevice ? "Press Watch to load the live screen." : "Add a Mobilerun key in setup to put a live phone here."}</span>
       <span>Gmail · Chrome · WhatsApp</span>
       <span>Instagram · X · Facebook</span>
       <span>LinkedIn · TikTok</span>

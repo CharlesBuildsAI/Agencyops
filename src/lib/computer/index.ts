@@ -9,12 +9,7 @@ export interface ComputerAdapter {
   listScreens(computerJson: string): DesktopScreen[];
 }
 
-const FALLBACK: DesktopScreen[] = [
-  { id: "ams360", label: "AMS360", tint: "blue" },
-  { id: "gmail", label: "Gmail", tint: "cream" },
-  { id: "quote", label: "Quote", tint: "green" },
-  { id: "carrier", label: "Carrier", tint: "pink" },
-];
+const FALLBACK: DesktopScreen[] = [];
 
 export function readScreens(computerJson: string): DesktopScreen[] {
   try {

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ApprovalCard, type ApprovalCardData } from "./approval-card";
+import { AndroidPhone } from "./android-phone";
 import { ComputerPane } from "./computer-pane";
 import { BotAvatar } from "./bot-avatar";
 import type { AvatarMood } from "@/lib/avatars";
@@ -10,7 +11,20 @@ import { Wave } from "./starfield";
 import { formatDuration } from "@/lib/time";
 
 type Desk = {
-  bot: { slug: string; name: string; roleTitle: string; color: string; paused: boolean; pausedReason: string };
+  bot: {
+    slug: string;
+    name: string;
+    roleTitle: string;
+    color: string;
+    paused: boolean;
+    pausedReason: string;
+    phone: string;
+    email: string;
+    phoneDeviceId: string;
+    phoneProvider: string;
+    orgoComputerId: string;
+    accounts: { name?: string; status?: string; packageName?: string; username?: string }[];
+  };
   messages: { id: string; role: string; content: string; meta: { kind?: string }; at: string }[];
   approvals: ApprovalCardData[];
   call: { id: string; contactName: string; phone: string; summary: string; startedAt: string } | null;
@@ -20,7 +34,8 @@ type Desk = {
   screenUrl: string;
 };
 
-export function ChatScreen({ desk }: { desk: Desk }) {
+export function ChatScreen({ desk, deviceTab = "phone" }: { desk: Desk; deviceTab?: "phone" | "accounts" }) {
+  const [device, setDevice] = useState<"phone" | "desktop">("phone");
   const router = useRouter();
   const params = useSearchParams();
   const screenMode = params.get("screen") === "1";
@@ -110,7 +125,7 @@ export function ChatScreen({ desk }: { desk: Desk }) {
           {desk.messages.length === 0 && (
             <div className="empty">
               <h2>{desk.bot.paused ? `${desk.bot.name} is paused` : `Message ${desk.bot.name}`}</h2>
-              <p>{desk.bot.paused ? desk.bot.pausedReason : "Ask for intake, a draft, or a handoff. Nothing leaves without approval."}</p>
+              <p>{desk.bot.paused ? desk.bot.pausedReason : "The Android phone is on the right. Ask for a draft. Nothing leaves without approval."}</p>
             </div>
           )}
           {desk.messages.map((message) => {
@@ -151,17 +166,38 @@ export function ChatScreen({ desk }: { desk: Desk }) {
           </form>
         </div>
       </section>
-      <ComputerPane
-        name={desk.bot.name}
-        slug={desk.bot.slug}
-        color={desk.bot.color}
-        screens={desk.screens}
-        initial={desk.activeScreen}
-        url={desk.screenUrl}
-        call={desk.call}
-        activities={desk.activities}
-        file={desk.approvals.find((approval) => approval.kind === "file")}
-      />
+      <div className="phone-column">
+        {desk.bot.orgoComputerId ? (
+          <div className="phone-tabs">
+            <button type="button" className={device === "phone" ? "on" : ""} onClick={() => setDevice("phone")}>Phone</button>
+            <button type="button" className={device === "desktop" ? "on" : ""} onClick={() => setDevice("desktop")}>Desktop</button>
+          </div>
+        ) : null}
+        {device === "desktop" && desk.bot.orgoComputerId ? (
+          <ComputerPane
+            name={desk.bot.name}
+            slug={desk.bot.slug}
+            color={desk.bot.color}
+            screens={desk.screens}
+            initial={desk.activeScreen}
+            url={desk.screenUrl}
+            call={desk.call}
+            activities={desk.activities}
+            file={desk.approvals.find((approval) => approval.kind === "file")}
+          />
+        ) : (
+          <AndroidPhone
+            slug={desk.bot.slug}
+            name={desk.bot.name}
+            phone={desk.bot.phone}
+            email={desk.bot.email}
+            hasDevice={Boolean(desk.bot.phoneDeviceId)}
+            provider={desk.bot.phoneProvider}
+            accounts={desk.bot.accounts}
+            initialTab={deviceTab}
+          />
+        )}
+      </div>
     </div>
   );
 }

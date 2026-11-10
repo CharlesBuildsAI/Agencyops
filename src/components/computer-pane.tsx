@@ -10,7 +10,6 @@ type Screen = { id: string; label: string; tint: string };
 type Call = { id: string; contactName: string; phone: string; summary: string; startedAt: string } | null;
 
 export function ComputerPane({
-  name,
   slug,
   color,
   screens,
@@ -64,7 +63,7 @@ export function ComputerPane({
     <aside className="panel computer-panel">
       <div className="comp-head">
         <div>
-          <strong>{name}&apos;s computer</strong>
+          <strong>Desktop</strong>
         </div>
         <div className="screen-nums mono">
           {screens.map((item, index) => (

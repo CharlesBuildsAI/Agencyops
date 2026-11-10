@@ -39,6 +39,15 @@
   --line-2: rgba(23,52,94,0.14);
   --danger: #d64545;
   --theme-fade: 1.2s;
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --fs-1: 12px;
+  --fs-2: 13px;
+  --fs-3: 15px;
+  --fs-4: 17px;
+  --fs-5: 22px;
   color-scheme: light;
 }
 html[data-theme="night"] { color-scheme: dark; }
@@ -71,9 +80,9 @@ button { cursor: pointer; }
 .app-grid {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
-  gap: 14px;
+  gap: 16px;
   height: 100vh;
-  padding: 14px;
+  padding: 16px;
 }
 .stage { display: flex; gap: 8px; min-width: 0; min-height: 0; }
 .contents-stage, .screen-mode { display: contents; }
@@ -215,6 +224,7 @@ button { cursor: pointer; }
 .chat-head, .comp-head {
   display: flex; align-items: center; gap: 10px; padding: 12px 14px; min-height: 64px;
 }
+.comp-head strong { color: var(--ink); font-weight: 720; }
 .chat-head .who b { font-size: 15px; }
 .live-dot { width: 8px; height: 8px; border-radius: 99px; background: #6fdb8e; box-shadow: 0 0 0 4px rgba(111,219,142,.12); }
 .head-copy { min-width: 0; flex: 1; }
@@ -258,11 +268,12 @@ button { cursor: pointer; }
 }
 .card .tag { font-size: 11px; letter-spacing: 0.08em; font-weight: 700; color: var(--accent-ink); margin-bottom: 8px; display: inline-flex; background: linear-gradient(180deg, var(--action), var(--action-2)); border-radius: 999px; padding: 4px 8px; }
 .card .tag em { font-style: normal; color: var(--faint); font-weight: 600; }
-.card h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; }
+.card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; color: var(--ink); }
 .card p { margin: 0 0 12px; color: var(--ink); font-size: 14.5px; line-height: 1.45; }
 .card .row { gap: 8px; flex-wrap: wrap; }
 .editor { width: 100%; min-height: 88px; border-radius: 12px; border: 0; background: var(--field); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2); padding: 10px; margin-bottom: 10px; resize: vertical; }
-.err { color: #ffb4b4; font-size: 12.5px; margin: 8px 0 0; }
+.err { color: #8E1C1C; font-size: var(--fs-1); margin: 8px 0 0; }
+html[data-theme="night"] .err { color: #FFD2D2; }
 
 .composer { padding: 8px 14px 14px; }
 .tool-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -363,9 +374,36 @@ textarea.field { height: auto; padding: 10px 12px; }
 .profile-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--ink); overflow: auto; }
 .chat-with { color: var(--ink); font-weight: 680; }
 .phone-desk { display: flex; gap: 18px; align-items: flex-start; width: min(760px, 100%); }
+.phone-column { width: min(384px, 42vw); flex: none; display: flex; flex-direction: column; min-height: 0; }
+.phone-column .computer-panel { width: 100%; flex: 1; }
+.phone-column > * { animation: pane-in 240ms ease; }
+@keyframes pane-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .phone-column > * { animation: none; } }
+.phone-pane { overflow: auto; padding-bottom: 16px; }
+.phone-pane .handset {
+  position: relative; width: auto; margin: 0 16px 16px; background: #0b0d14; border-radius: 40px; padding: 28px 12px 16px;
+  box-shadow: 0 24px 40px rgba(7, 12, 28, .32), inset 0 0 0 1px rgba(255,255,255,.22), inset 0 0 0 6px #05060c;
+}
+.phone-pane .handset::before { content: ""; position: absolute; top: 12px; left: 50%; width: 56px; height: 6px; border-radius: 99px; transform: translateX(-50%); background: rgba(255,255,255,.28); }
+.phone-actions, .phone-type, .phone-facts { padding: 0 12px 8px; }
+.phone-tabs { display: flex; gap: 8px; padding: 4px 12px 8px; }
+.phone-tabs button { border: 0; background: transparent; color: var(--ink); font: 600 var(--fs-2)/1 Geist, sans-serif; border-radius: 999px; padding: 8px 12px; transition: background .2s ease, color .2s ease; }
+.phone-tabs button:hover { background: var(--chip); }
+.phone-tabs button.on { background: var(--chip); }
+.account-table tr:hover td { background: var(--chip); }
+.handset-keys .btn, .phone-actions .btn { transition: transform .2s ease, filter .2s ease, background .2s ease; }
+.handset-keys .btn:hover, .phone-actions .btn:hover { transform: translateY(-1px); }
+.account-table { width: 100%; border-collapse: collapse; color: var(--ink); margin-bottom: 10px; }
+.account-table th, .account-table td { text-align: left; padding: 8px 4px; border-bottom: 1px solid var(--line); color: var(--ink); font-weight: 640; }
 .handset { width: 230px; flex: none; background: var(--solid); border-radius: 28px; padding: 12px; box-shadow: inset 0 1px 0 var(--rim); }
 .handset-title { text-align: center; font-size: 13px; font-weight: 680; color: var(--ink); margin-bottom: 8px; }
-.handset-screen { width: 100%; aspect-ratio: 9 / 19.5; border: 0; border-radius: 22px; overflow: hidden; background: #17345e; color: #f4fbff; padding: 0; }
+.handset-screen { width: 100%; aspect-ratio: 9 / 19.5; border: 0; border-radius: 28px; overflow: hidden; background: #10203f; color: #f4fbff; padding: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+.phone-skeleton { display: grid; gap: 12px; align-content: center; height: 100%; padding: 24px; }
+.phone-skeleton i { display: block; height: 12px; border-radius: 99px; background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.32), rgba(255,255,255,.12)); background-size: 200% 100%; animation: shimmer 1.2s ease infinite; }
+.phone-skeleton i:nth-child(2) { width: 70%; }
+.phone-skeleton i:nth-child(3) { width: 46%; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .phone-skeleton i { animation: none; } }
 .handset-screen img { width: 100%; height: 100%; object-fit: cover; }
 .demo-screen { display: grid; gap: 8px; place-items: center; height: 100%; padding: 16px; text-align: center; }
 .demo-screen strong, .demo-screen em, .demo-screen span { color: #f4fbff; }
@@ -378,7 +416,8 @@ textarea.field { height: auto; padding: 10px 12px; }
 .account-list span { color: var(--muted); font-weight: 560; }
 .profile-side { width: min(460px, 48%); padding: 18px; overflow: auto; gap: 12px; }
 .block { background: var(--chip); box-shadow: inset 0 1px 0 var(--rim); border-radius: 20px; padding: 4px 14px; }
-.block h2 { font-size: 13px; color: var(--muted); font-weight: 600; margin: 12px 0; }
+.block h2 { font-size: 13px; color: var(--ink); font-weight: 720; margin: 12px 0; }
+.block strong { color: var(--ink); font-weight: 720; }
 .line { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); color: var(--ink); font-weight: 640; }
 .line small { color: var(--muted); display: block; font-weight: 500; }
 

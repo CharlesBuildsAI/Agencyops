@@ -269,7 +269,7 @@ export async function loadDesk(agencyId: string, slug: string) {
       at: formatClockWithPeriod(activity.createdAt, agency.timezone),
     })),
     screens,
-    activeScreen: computer.active || (call ? "call" : screens[0]?.id || "ams360"),
+    activeScreen: computer.active || (call ? "call" : screens[0]?.id || ""),
     screenUrl: computer.url || "",
     timezone: agency.timezone,
   };
