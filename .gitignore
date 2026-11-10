@@ -34,6 +34,11 @@ yarn-error.log*
 .env*
 !.env.example
 
+# desktop bundle, installer output, and its node_modules
+/desktop/node_modules
+/desktop/bundle
+/desktop/release
+
 # databases and local disks
 /prisma/dev.db
 /prisma/dev.db-journal

@@ -94,6 +94,26 @@ Copy `.env.example`. Every key is listed there.
 | `COMPUTER_PROVIDER` | `stub` or `orgo`. v1 always draws the local desktop. |
 | `HAWKSOFT_API_KEY`, `HAWKSOFT_AGENCY_ID`, `AMS360_APP_KEY`, `COMPOSIO_API_KEY` | Connector stubs. Blank stays in sandbox. |
 
+## Windows app
+
+The desktop app is the same desk in its own window, titled AgencyOps, with the blue agent icon. It installs on Windows and runs offline in mock mode: no API keys, the Rivera demo login, and the same glass themes. Building it does not change the web app or its deploy.
+
+```bash
+npm run desktop:dev
+```
+
+That opens a window onto the dev server at http://127.0.0.1:43123 (and starts the server if it is not already up).
+
+```bash
+npm run desktop:build
+```
+
+The installer is written to `desktop/release/AgencyOps-Setup-0.1.0.exe`. Run it, then launch AgencyOps from the desktop shortcut. Sign in with `rosa@rivera.insurance` / `rivera-demo`.
+
+The installer is unsigned. Windows SmartScreen warns that an unrecognized app is trying to start. Choose **More info**, then **Run anyway**.
+
+A Windows installer built on Linux needs Wine, which `electron-builder` uses to run NSIS.
+
 ## Deploy
 
 The SQLite file has to live on a persistent disk. Vercel serverless will not keep it. Fly and Render will, if you attach a volume. You can also switch the Prisma datasource to Postgres and run a migration.

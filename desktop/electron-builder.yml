@@ -1,0 +1,37 @@
+appId: com.charlesconnelly.agencyops
+productName: AgencyOps
+copyright: Copyright © 2026 Charles Connelly
+asar: true
+npmRebuild: false
+compression: maximum
+electronLanguages:
+  - en-US
+directories:
+  output: release
+files:
+  - main.cjs
+  - preload.cjs
+  - icon.png
+  - package.json
+extraResources:
+  - from: bundle
+    to: standalone
+  - from: icon.png
+    to: icon.png
+afterPack: after-pack.cjs
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: icon.ico
+  artifactName: AgencyOps-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: AgencyOps
+  uninstallDisplayName: AgencyOps
+  license: ../LICENSE

@@ -12,6 +12,8 @@
     "test": "vitest run",
     "setup": "prisma migrate deploy && tsx --env-file=.env prisma/seed.ts",
     "db:seed": "tsx --env-file=.env prisma/seed.ts",
+    "desktop:dev": "node desktop/dev.mjs",
+    "desktop:build": "node desktop/build.mjs",
     "postinstall": "prisma generate"
   },
   "prisma": {
