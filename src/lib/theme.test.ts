@@ -1,5 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { periodAt, solarMinutes, themeAtMinute, THEMES } from "./theme";
+import { contrastRatio } from "./accent";
+import { periodAt, solarMinutes, themeAtMinute, THEMES, type ThemeTokens } from "./theme";
+
+function channel(hex: string) {
+  const value = hex.replace("#", "");
+  return [0, 2, 4].map((index) => parseInt(value.slice(index, index + 2), 16));
+}
+
+function over(paint: string, base: string) {
+  const match = paint.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+))?\s*\)/);
+  if (!match) return paint;
+  const alpha = match[4] === undefined ? 1 : Number(match[4]);
+  const back = channel(base);
+  const mixed = [1, 2, 3].map((index, slot) => Math.round(Number(match[index]) * alpha + back[slot] * (1 - alpha)));
+  return `#${mixed.map((part) => part.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function surfaces(theme: ThemeTokens) {
+  return [over(theme.solid, theme.radial), over(theme.glass, theme.radial), over(theme.glass, theme.g0), over(theme.chip, theme.radial)];
+}
 
 describe("time of day", () => {
   it("uses the fixed local schedule away from the boundaries", () => {
@@ -28,5 +47,15 @@ describe("time of day", () => {
     expect(solar!.sunset - solar!.sunrise).toBeGreaterThan(8 * 60);
     expect(solar!.sunrise).toBeGreaterThan(0);
     expect(solar!.sunset).toBeLessThan(48 * 60);
+  });
+
+  it("keeps ink, muted, and faint text above 4.5:1 on every theme surface", () => {
+    for (const theme of Object.values(THEMES)) {
+      for (const surface of surfaces(theme)) {
+        expect(contrastRatio(theme.ink, surface)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(theme.muted, surface)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(theme.faint, surface)).toBeGreaterThanOrEqual(4.5);
+      }
+    }
   });
 });

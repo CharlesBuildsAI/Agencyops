@@ -38,12 +38,23 @@ export function AndroidPhone({
   const [loginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
+
+  useEffect(() => {
     if (!watching || !hasDevice || provider !== "mobilerun") return;
     let stop = false;
     const pull = async () => {
       const response = await fetch(`/api/bots/${slug}/phone/screen?t=${Date.now()}`);
-      if (!response.ok || stop) return;
+      if (stop) return;
+      if (response.status === 204) {
+        setWatching(false);
+        setNotice("No live screen yet. Add a Mobilerun key in setup, then press Watch.");
+        return;
+      }
+      if (!response.ok) return;
       const blob = await response.blob();
+      if (!blob.size) return;
       setShot((current) => {
         if (current) URL.revokeObjectURL(current);
         return URL.createObjectURL(blob);
@@ -86,7 +97,7 @@ export function AndroidPhone({
   }
 
   return (
-    <aside className="panel computer-panel phone-pane">
+    <aside className={`panel computer-panel phone-pane${tab === "accounts" ? " is-accounts" : ""}`}>
       <div className="comp-head">
         <strong>{name}&apos;s Android phone</strong>
       </div>
@@ -107,8 +118,8 @@ export function AndroidPhone({
             // Live device frame, not a static asset.
             // eslint-disable-next-line @next/next/no-img-element
             <img src={shot} alt="" />
-          ) : watching ? (
-            <span className="phone-skeleton" aria-hidden><i /><i /><i /></span>
+          ) : watching && hasDevice && provider === "mobilerun" ? (
+            <span className="phone-skeleton" aria-label="Loading the phone screen"><i /><i /><i /></span>
           ) : (
             <DemoScreen name={name} hasDevice={hasDevice} />
           )}
@@ -133,12 +144,13 @@ export function AndroidPhone({
         <button type="button" className={tab === "accounts" ? "on" : ""} onClick={() => setTab("accounts")}>Accounts</button>
       </div>
       {tab === "phone" ? (
-        <div className="phone-facts">
-          <p><b>Number</b> {phone || "No carrier line yet"}</p>
-          <p><b>Email</b> {email || "No inbox yet"}</p>
+        <div className="phone-facts" key="phone">
+          <p><b>Number</b> {phone || "No carrier line yet. A Mobilerun key, or AgentPhone or Twilio, assigns one."}</p>
+          <p><b>Email</b> {email || "No inbox yet. Add an AgentMail key in setup to give this phone one."}</p>
         </div>
       ) : (
-        <div className="phone-facts">
+        <div className="phone-facts" key="accounts">
+          <p className="muted">Sign in with an account the business already has. This does not create a new one.</p>
           <table className="account-table">
             <thead><tr><th>App</th><th>Status</th><th></th></tr></thead>
             <tbody>

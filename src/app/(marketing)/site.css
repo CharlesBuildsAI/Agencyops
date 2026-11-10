@@ -3,7 +3,7 @@
 @font-face{font-family:"Geist Mono";src:url(/site/assets/fonts/GeistMono-Variable.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{--g0:#8AD4EE;--g1:#B29FCB;--g2:#4263AA;--g3:#304C90;--radial:#EEF1FD;
   --glass:rgba(255,255,255,.8);--chip:rgba(255,255,255,.62);--solid:rgba(255,255,255,.94);
-  --ink:#17345E;--text:#17345E;--muted:#3E5A86;--faint:#5E7598;--moon:#3E5A86;
+  --ink:#17345E;--text:#17345E;--muted:#3E5A86;--faint:#3E567C;--moon:#3E5A86;
   --line:rgba(23,52,94,.1);--line-2:rgba(23,52,94,.16);
   --action:#557AE7;--action-2:#2F4FB9;--accent:#557AE7;--accent-ink:#fff;--shadow:rgba(25,58,135,.22);--rim:rgba(255,255,255,.95);
   --bg:transparent;--surface:var(--glass);--surface-2:var(--chip);--raise:var(--solid);
