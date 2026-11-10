@@ -2,6 +2,7 @@ import type { AgentDeps } from "./loop";
 import { prisma } from "../db";
 import { getProvider } from "../llm";
 import type { LlmProvider } from "../llm/types";
+import { runPhoneCommand } from "../phone-actions";
 import { chargeUsage } from "../usage";
 
 export function makePrismaDeps(
@@ -16,6 +17,14 @@ export function makePrismaDeps(
 ): AgentDeps {
   return {
     provider,
+    botId: ctx.botId,
+    async runPhone(command) {
+      const bot = await prisma.bot.findUnique({ where: { id: ctx.botId } });
+      return runPhoneCommand(
+        { provider: bot?.phoneProvider || "mock", deviceId: bot?.phoneDeviceId || "" },
+        command,
+      );
+    },
     async recordUsage(usage) {
       await chargeUsage({ ...usage, agencyId: ctx.agencyId, botId: ctx.botId, timeZone: ctx.timeZone });
     },

@@ -1,6 +1,7 @@
 import { assertCanSpend, BudgetExceededError, llmCostCents } from "../budget";
 import { guardOutboundText } from "../guardrails";
 import { AGENT_TOOLS } from "../llm/tools";
+import { runPhoneCommand, type PhoneCommand } from "../phone-actions";
 import type { ChatTurn, LlmProvider, ToolCall } from "../llm/types";
 import { buildSystemPrompt, type PromptBot } from "./prompt";
 
@@ -46,6 +47,8 @@ export type AgentDeps = {
   saveMemory: (note: string) => Promise<void>;
   fileTask: (task: { title: string; detail: string; needsYou: boolean }) => Promise<void>;
   handoff: (handoff: { botSlug: string; summary: string }) => Promise<void>;
+  botId?: string;
+  runPhone?: (command: PhoneCommand) => Promise<{ ok: boolean; detail: string; sandbox?: boolean }>;
 };
 
 export type AgentRunResult = {
@@ -53,6 +56,31 @@ export type AgentRunResult = {
   text: string;
   approvals: CreatedApproval[];
 };
+
+const GATED = new Set(["send", "post", "pay", "install"]);
+
+function commits(input: Record<string, unknown>) {
+  const value = textField(input, "commits");
+  return GATED.has(value) ? value : "";
+}
+
+function numberField(input: Record<string, unknown>, key: string) {
+  const value = input[key];
+  return typeof value === "number" ? value : Number(value || 0);
+}
+
+async function drivePhone(deps: AgentDeps, command: PhoneCommand) {
+  if (deps.runPhone) return deps.runPhone(command);
+  return runPhoneCommand({ provider: "mock", deviceId: "" }, command);
+}
+
+async function queuePhone(deps: AgentDeps, approvals: CreatedApproval[], title: string, command: PhoneCommand) {
+  const payload = { ...command, botId: deps.botId || "" };
+  const created = await deps.createApproval({ kind: "phone", status: "pending", title, payload });
+  approvals.push({ id: created.id, kind: "phone", status: "pending", title, payload });
+  await deps.audit({ action: "approval.created", target: created.id, detail: title });
+  return JSON.stringify({ ok: true, approvalId: created.id, status: "pending", acted: false });
+}
 
 function textField(input: Record<string, unknown>, key: string) {
   const value = input[key];
@@ -137,6 +165,49 @@ async function executeTool(call: ToolCall, deps: AgentDeps, approvals: CreatedAp
     case "handoff": {
       await deps.handoff({ botSlug: textField(input, "botSlug"), summary: textField(input, "summary") });
       return JSON.stringify({ ok: true, sent: false });
+    }
+    case "observe": {
+      const result = await drivePhone(deps, { op: "observe" });
+      return JSON.stringify(result);
+    }
+    case "open_app": {
+      const result = await drivePhone(deps, { op: "open_app", packageName: textField(input, "packageName") });
+      return JSON.stringify(result);
+    }
+    case "install_app": {
+      const name = textField(input, "name") || textField(input, "packageName");
+      const via = textField(input, "via") === "play" ? "play" : "api";
+      return queuePhone(deps, approvals, `Install ${name}`, {
+        op: "install_app",
+        packageName: textField(input, "packageName"),
+        via,
+      });
+    }
+    case "tap": {
+      const command: PhoneCommand = { op: "tap", x: numberField(input, "x"), y: numberField(input, "y") };
+      if (commits(input)) return queuePhone(deps, approvals, `Phone tap would ${commits(input)}`, command);
+      return JSON.stringify(await drivePhone(deps, command));
+    }
+    case "swipe": {
+      const command: PhoneCommand = {
+        op: "swipe",
+        startX: numberField(input, "startX"),
+        startY: numberField(input, "startY"),
+        endX: numberField(input, "endX"),
+        endY: numberField(input, "endY"),
+        duration: numberField(input, "duration") || 300,
+      };
+      if (commits(input)) return queuePhone(deps, approvals, `Phone swipe would ${commits(input)}`, command);
+      return JSON.stringify(await drivePhone(deps, command));
+    }
+    case "type": {
+      const command: PhoneCommand = { op: "type", text: textField(input, "text") };
+      if (commits(input)) return queuePhone(deps, approvals, `Phone typing would ${commits(input)}`, command);
+      return JSON.stringify(await drivePhone(deps, command));
+    }
+    case "phone_key": {
+      const key = textField(input, "key") === "home" ? "home" : "back";
+      return JSON.stringify(await drivePhone(deps, { op: "key", key }));
     }
     case "file_task": {
       await deps.fileTask({

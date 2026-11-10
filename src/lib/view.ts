@@ -216,6 +216,16 @@ export async function loadDesk(agencyId: string, slug: string) {
       spentLabel: dollars(bot.spentCents),
       capLabel: dollars(bot.monthlyCapCents),
       instructions: bot.instructions,
+      orgoStatus: bot.orgoStatus,
+      orgoComputerId: bot.orgoComputerId,
+      composioSummary: bot.composioSummary,
+      provision: (() => {
+        try {
+          return JSON.parse(bot.provisionJson) as { mail?: string; phone?: string; orgo?: string; composio?: string };
+        } catch {
+          return {};
+        }
+      })(),
     },
     threadId: thread?.id ?? null,
     messages: messages.map((message) => ({

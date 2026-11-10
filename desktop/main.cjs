@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, shell } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } = require("electron");
 const { spawn } = require("child_process");
 const crypto = require("crypto");
 const fs = require("fs");
@@ -85,6 +85,49 @@ function waitFor(url) {
 }
 
 let serverProcess = null;
+let desktopWindow = null;
+let listenPort = 0;
+let dbFile = "";
+
+function secretsFile() {
+  return path.join(app.getPath("userData"), "secrets.bin");
+}
+
+function readSecrets() {
+  try {
+    if (!fs.existsSync(secretsFile()) || !safeStorage.isEncryptionAvailable()) return {};
+    return JSON.parse(safeStorage.decryptString(fs.readFileSync(secretsFile())));
+  } catch {
+    return {};
+  }
+}
+
+function writeSecrets(values) {
+  if (!safeStorage.isEncryptionAvailable()) {
+    throw new Error("This computer cannot lock secrets. The OS keychain is unavailable.");
+  }
+  fs.writeFileSync(secretsFile(), safeStorage.encryptString(JSON.stringify(values)));
+}
+
+function secretEnv(port) {
+  const saved = readSecrets();
+  const llm = saved.ANTHROPIC_API_KEY || saved.OPENAI_API_KEY || "";
+  const live = Boolean(saved.AGENTMAIL_API_KEY || saved.AGENTPHONE_API_KEY || saved.TWILIO_ACCOUNT_SID);
+  return {
+    ...saved,
+    AGENTPHONE_BASE_URL: saved.AGENTPHONE_BASE_URL || "https://api.agentphone.ai",
+    LLM_PROVIDER: llm ? "auto" : "mock",
+    CHANNEL_MODE: live ? "live" : "mock",
+    COMPUTER_PROVIDER: saved.ORGO_API_KEY ? "orgo" : "stub",
+    DEMO_MODE: "true",
+    NODE_ENV: "production",
+    PORT: String(port),
+    HOSTNAME: "127.0.0.1",
+    DEMO_WEBHOOK_SECRET: "demo",
+    AUTH_SECRET: ensureSecret(app.getPath("userData")),
+    APP_URL: `http://127.0.0.1:${port}`,
+  };
+}
 
 function startServer(port, dbPath, secret) {
   const dir = standaloneDir();
@@ -96,14 +139,7 @@ function startServer(port, dbPath, secret) {
     env: {
       ...process.env,
       ELECTRON_RUN_AS_NODE: "1",
-      NODE_ENV: "production",
-      PORT: String(port),
-      HOSTNAME: "127.0.0.1",
-      DEMO_MODE: "true",
-      LLM_PROVIDER: "mock",
-      CHANNEL_MODE: "mock",
-      COMPUTER_PROVIDER: "stub",
-      DEMO_WEBHOOK_SECRET: "demo",
+      ...secretEnv(port),
       AUTH_SECRET: secret,
       DATABASE_URL: databaseUrl(dbPath),
       APP_URL: base,
@@ -146,9 +182,33 @@ async function openWindow(url) {
     shell.openExternal(target);
     return { action: "deny" };
   });
+  desktopWindow = window;
   await window.loadURL(url);
   window.setTitle("AgencyOps");
 }
+
+ipcMain.handle("secrets:save", async (_event, incoming) => {
+  try {
+    const next = { ...readSecrets(), ...(incoming || {}) };
+    for (const key of Object.keys(next)) {
+      if (!next[key]) delete next[key];
+    }
+    writeSecrets(next);
+    if (serverProcess) {
+      await new Promise((resolve) => {
+        serverProcess.once("exit", resolve);
+        serverProcess.kill();
+      });
+      serverProcess = null;
+    }
+    const base = startServer(listenPort, dbFile, ensureSecret(app.getPath("userData")));
+    await waitFor(`${base}/setup`);
+    if (desktopWindow) desktopWindow.reload();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Could not store keys." };
+  }
+});
 
 app.on("second-instance", () => {
   const open = BrowserWindow.getAllWindows()[0];
@@ -177,10 +237,11 @@ if (gotLock) {
         return;
       }
       const dataDir = app.getPath("userData");
-      const port = await freePort();
-      const base = startServer(port, prepareData(dataDir), ensureSecret(dataDir));
-      await waitFor(`${base}/login`);
-      await openWindow(`${base}/login`);
+      dbFile = prepareData(dataDir);
+      listenPort = await freePort();
+      const base = startServer(listenPort, dbFile, ensureSecret(dataDir));
+      await waitFor(`${base}/setup`);
+      await openWindow(`${base}/setup`);
     } catch (error) {
       dialog.showErrorBox("AgencyOps", error instanceof Error ? error.message : "The local desk did not start.");
       app.quit();

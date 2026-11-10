@@ -9,6 +9,10 @@ export async function authed() {
   return { user, error: null };
 }
 
+export function ok(body: Record<string, unknown> = {}) {
+  return NextResponse.json(body);
+}
+
 export function bad(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }

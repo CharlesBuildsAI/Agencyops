@@ -1,4 +1,7 @@
 import type { SendReceipt } from "../approvals";
+import { prisma } from "../db";
+import { runPhoneCommand, type PhoneCommand } from "../phone-actions";
+import { secret } from "../runtime-secrets";
 
 type Payload = Record<string, unknown>;
 
@@ -16,9 +19,9 @@ export function channelMode() {
 }
 
 async function sendTwilioSms(payload: Payload): Promise<SendReceipt> {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  const from = process.env.TWILIO_FROM_NUMBER;
+  const sid = secret("TWILIO_ACCOUNT_SID");
+  const token = secret("TWILIO_AUTH_TOKEN");
+  const from = secret("TWILIO_FROM_NUMBER");
   if (channelMode() !== "live" || !sid || !token || !from) {
     return sandbox("twilio", `Sandbox SMS to ${text(payload, "to")}. Twilio keys are not in use.`);
   }
@@ -41,12 +44,12 @@ async function sendTwilioSms(payload: Payload): Promise<SendReceipt> {
 }
 
 async function sendAgentPhone(payload: Payload): Promise<SendReceipt> {
-  const key = process.env.AGENTPHONE_API_KEY;
-  const base = process.env.AGENTPHONE_BASE_URL;
+  const key = secret("AGENTPHONE_API_KEY");
+  const base = secret("AGENTPHONE_BASE_URL") || "https://api.agentphone.ai";
   if (channelMode() !== "live" || !key || !base) {
     return sandbox("agentphone", "AgentPhone adapter is idle. Set AGENTPHONE_API_KEY and AGENTPHONE_BASE_URL to dial.");
   }
-  const response = await fetch(`${base.replace(/\/$/, "")}/messages`, {
+  const response = await fetch(`${base.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
     headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
     body: JSON.stringify({ to: text(payload, "to"), body: text(payload, "body") || text(payload, "purpose") }),
@@ -57,7 +60,7 @@ async function sendAgentPhone(payload: Payload): Promise<SendReceipt> {
 }
 
 async function sendAgentMail(payload: Payload): Promise<SendReceipt> {
-  const key = process.env.AGENTMAIL_API_KEY;
+  const key = secret("AGENTMAIL_API_KEY");
   const inbox = process.env.AGENTMAIL_INBOX_ID;
   if (channelMode() !== "live" || !key || !inbox) {
     return sandbox("agentmail", `Sandbox email to ${text(payload, "to")}. AgentMail is not connected.`);
@@ -78,16 +81,25 @@ async function sendAgentMail(payload: Payload): Promise<SendReceipt> {
 
 export async function sendOutbound(kind: string, payload: Payload): Promise<SendReceipt> {
   if (kind === "sms") {
-    if (process.env.AGENTPHONE_API_KEY && !process.env.TWILIO_ACCOUNT_SID) return sendAgentPhone(payload);
+    if (secret("AGENTPHONE_API_KEY") && !secret("TWILIO_ACCOUNT_SID")) return sendAgentPhone(payload);
     return sendTwilioSms(payload);
   }
   if (kind === "email") return sendAgentMail(payload);
   if (kind === "call") {
-    if (process.env.AGENTPHONE_API_KEY) return sendAgentPhone(payload);
-    if (channelMode() === "live" && process.env.TWILIO_ACCOUNT_SID) {
+    if (secret("AGENTPHONE_API_KEY")) return sendAgentPhone(payload);
+    if (channelMode() === "live" && secret("TWILIO_ACCOUNT_SID")) {
       return sandbox("twilio", "Call approved. Twilio voice is recorded as a desk release in v1; the script is in the audit log.");
     }
     return sandbox("twilio", `Sandbox call to ${text(payload, "to")}. Nothing was dialed.`);
+  }
+  if (kind === "phone") {
+    const botId = text(payload, "botId");
+    const bot = botId ? await prisma.bot.findUnique({ where: { id: botId } }) : null;
+    const result = await runPhoneCommand(
+      { provider: bot?.phoneProvider || "mock", deviceId: bot?.phoneDeviceId || "" },
+      payload as PhoneCommand,
+    );
+    return { provider: bot?.phoneProvider || "mock", id: "phone", sandbox: Boolean(result.sandbox), detail: result.detail };
   }
   if (kind === "file") {
     return sandbox("desk", "Certificate released. Download is now available.");

@@ -9,13 +9,6 @@ import { runDanaDemo } from "../src/lib/demo";
 import { allowDemoCredentials } from "../src/lib/demo-mode";
 import { dayKey, monthKey } from "../src/lib/time";
 
-if (!allowDemoCredentials()) {
-  console.error(
-    "Refusing to seed the Rivera demo in production. Set DEMO_MODE=true only for a public showcase, then change the owner password and turn DEMO_MODE off.",
-  );
-  process.exit(1);
-}
-
 const prisma = new PrismaClient();
 const TZ = "America/Denver";
 
@@ -32,7 +25,7 @@ function todayAt(time: string) {
   return new Date(`${day}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00-07:00`);
 }
 
-async function main() {
+export async function seedRivera() {
   await prisma.agency.deleteMany();
   const now = new Date();
   const month = monthKey(now, TZ);
@@ -53,6 +46,8 @@ async function main() {
       callBase: 134,
       approvalBase: 33,
       answeredRate: 92,
+      industry: "Insurance",
+      setupComplete: true,
     },
   });
 
@@ -428,11 +423,20 @@ async function main() {
   console.log(`Seeded Rivera Insurance. Approvals in database: ${approvals}. Login rosa@rivera.insurance / rivera-demo`);
 }
 
-main()
-  .catch((error) => {
-    console.error(error);
+const ranAsScript = process.argv[1]?.includes("seed");
+if (ranAsScript) {
+  if (!allowDemoCredentials()) {
+    console.error(
+      "Refusing to seed the Rivera demo in production. Set DEMO_MODE=true only for a public showcase, then change the owner password and turn DEMO_MODE off.",
+    );
     process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  }
+  seedRivera()
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

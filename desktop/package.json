@@ -1,6 +1,6 @@
 {
   "name": "agencyops-desktop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "AgencyOps desktop shell. The Next.js server ships beside this window.",
   "author": "Charles Connelly",

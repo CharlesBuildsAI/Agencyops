@@ -1,3 +1,4 @@
+import { secret } from "../runtime-secrets";
 import type { LlmProvider, LlmRequest, LlmResult, ToolCall } from "./types";
 
 type AnthropicBlock =
@@ -13,7 +14,7 @@ export class AnthropicProvider implements LlmProvider {
   }
 
   async complete(request: LlmRequest): Promise<LlmResult> {
-    const key = process.env.ANTHROPIC_API_KEY;
+    const key = secret("ANTHROPIC_API_KEY");
     if (!key) throw new Error("ANTHROPIC_API_KEY is not set");
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",

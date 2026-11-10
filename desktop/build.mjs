@@ -66,11 +66,7 @@ if (!engines.some((name) => name.includes("windows") && name.endsWith(".node")))
 
 const template = path.join(bundle, "template.db");
 fs.rmSync(template, { force: true });
-const dbUrl = `file:${template}`;
-run("npx", ["prisma", "migrate", "deploy"], { env: { DATABASE_URL: dbUrl } });
-run("npx", ["tsx", "prisma/seed.ts"], {
-  env: { DATABASE_URL: dbUrl, DEMO_MODE: "true", NODE_ENV: "production" },
-});
+run("npx", ["prisma", "migrate", "deploy"], { env: { DATABASE_URL: `file:${template}` } });
 
 run(path.join(desktop, "node_modules", ".bin", "electron-builder"), ["--win", "nsis", "--x64", "--config", "electron-builder.yml"], {
   cwd: desktop,

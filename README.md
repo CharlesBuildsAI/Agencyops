@@ -20,11 +20,15 @@ Buttons, pills, focus rings, and the agent circles use the agency accent. The st
 
 ## Download for Windows
 
-[![Download for Windows](https://img.shields.io/badge/Download-Windows%2010%2F11-2F62E6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/CharlesBuildsAI/Agencyops/releases/download/v0.1.0/AgencyOps-Setup-0.1.0.exe)
+[![Download for Windows](https://img.shields.io/badge/Download-Windows%2010%2F11-2F62E6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/CharlesBuildsAI/Agencyops/releases/download/v0.2.0/AgencyOps-Setup-0.2.0.exe)
 
-Windows 10 or 11. The installer runs offline in demo mode: no API keys, and the Rivera login works out of the box. The same release is listed at [v0.1.0](https://github.com/CharlesBuildsAI/Agencyops/releases/tag/v0.1.0).
+Windows 10 or 11. Install it, open AgencyOps, and the setup wizard asks for your business and, if you want them, your own provider keys. Skip any key and that service stays in demo mode. The Rivera Insurance desk is a sample on the last step. The release is [v0.2.0](https://github.com/CharlesBuildsAI/Agencyops/releases/tag/v0.2.0).
 
 The installer is unsigned. On the SmartScreen prompt, click **More info**, then **Run anyway**.
+
+Keys stay in the Windows keychain. They are sent only to the provider you paste them for. Each provider sets its own prices.
+
+Each agent gets its own Android phone when a Mobilerun or Limrun key is saved. On Mobilerun the agent can read the screen, open an app, tap, swipe, type, go back, and go home. An install waits for you, whether it uses an APK already in the Mobilerun library or opens the Play Store for you to approve. A tap that would send, post, or pay also waits in chat. Mobilerun does not create social accounts. Limrun can create and delete the phone. Its management API does not drive the screen. An eSIM listing has no dialable number. An included Mobilerun number is requested, and if that would open checkout the desk stops and can use AgentPhone or Twilio instead. AgentMail, Composio, and an optional Orgo desktop stay off unless you add those keys.
 
 ## What you can click through
 
@@ -116,7 +120,7 @@ That opens a window onto the dev server at http://127.0.0.1:43123 (and starts th
 npm run desktop:build
 ```
 
-The installer is written to `desktop/release/AgencyOps-Setup-0.1.0.exe`. Run it, then launch AgencyOps from the desktop shortcut. Sign in with `rosa@rivera.insurance` / `rivera-demo`.
+The installer is written to `desktop/release/AgencyOps-Setup-0.2.0.exe`. Run it, then launch AgencyOps. The wizard is the first screen. The Rivera sample on the last step signs in as `rosa@rivera.insurance` / `rivera-demo`.
 
 The installer is unsigned. Windows SmartScreen warns that an unrecognized app is trying to start. Choose **More info**, then **Run anyway**.
 

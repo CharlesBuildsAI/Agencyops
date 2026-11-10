@@ -1,3 +1,4 @@
+import { secret } from "../runtime-secrets";
 import type { LlmProvider, LlmRequest, LlmResult, ToolCall } from "./types";
 
 type OpenAiMessage = {
@@ -17,7 +18,7 @@ export class OpenAiProvider implements LlmProvider {
   }
 
   async complete(request: LlmRequest): Promise<LlmResult> {
-    const key = process.env.OPENAI_API_KEY;
+    const key = secret("OPENAI_API_KEY");
     if (!key) throw new Error("OPENAI_API_KEY is not set");
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",

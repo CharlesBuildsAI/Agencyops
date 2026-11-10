@@ -1,0 +1,10 @@
+ALTER TABLE "Agency" ADD COLUMN "industry" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Agency" ADD COLUMN "setupComplete" BOOLEAN NOT NULL DEFAULT false;
+UPDATE "Agency" SET "setupComplete" = 1, "industry" = 'Insurance' WHERE "industry" = '';
+
+ALTER TABLE "Bot" ADD COLUMN "mailInboxId" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Bot" ADD COLUMN "phoneNumberId" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Bot" ADD COLUMN "orgoComputerId" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Bot" ADD COLUMN "orgoStatus" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Bot" ADD COLUMN "composioSummary" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Bot" ADD COLUMN "provisionJson" TEXT NOT NULL DEFAULT '{}';

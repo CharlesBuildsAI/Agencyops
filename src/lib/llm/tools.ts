@@ -94,6 +94,83 @@ export const AGENT_TOOLS: ToolDef[] = [
     },
   },
   {
+    name: "observe",
+    description: "Read this agent's Android phone. Returns the on-screen app and clickable labels. Does not send, post, or pay.",
+    parameters: { type: "object", properties: {}, required: [] },
+  },
+  {
+    name: "open_app",
+    description: "Open an installed app by Android package name. Opening an app does not send or post.",
+    parameters: {
+      type: "object",
+      properties: { packageName: { type: "string" } },
+      required: ["packageName"],
+    },
+  },
+  {
+    name: "install_app",
+    description: "Ask the owner before installing an app. via=api uses the provider install API. via=play opens the Play Store after approval. Never creates a store account.",
+    parameters: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        packageName: { type: "string" },
+        via: { type: "string", description: "api or play" },
+      },
+      required: ["packageName", "via"],
+    },
+  },
+  {
+    name: "tap",
+    description: "Tap the phone. Set commits to send, post, pay, or install if this tap would do that. Those wait for the owner. Otherwise the tap happens now.",
+    parameters: {
+      type: "object",
+      properties: {
+        x: { type: "number" },
+        y: { type: "number" },
+        commits: { type: "string", description: "none, send, post, pay, or install" },
+      },
+      required: ["x", "y"],
+    },
+  },
+  {
+    name: "swipe",
+    description: "Swipe or scroll. Set commits if the gesture would send, post, pay, or confirm an install.",
+    parameters: {
+      type: "object",
+      properties: {
+        startX: { type: "number" },
+        startY: { type: "number" },
+        endX: { type: "number" },
+        endY: { type: "number" },
+        duration: { type: "number" },
+        commits: { type: "string" },
+      },
+      required: ["startX", "startY", "endX", "endY"],
+    },
+  },
+  {
+    name: "type",
+    description: "Type into the focused field. Set commits if the text submits a send, post, payment, or install.",
+    parameters: {
+      type: "object",
+      properties: {
+        text: { type: "string" },
+        commits: { type: "string" },
+      },
+      required: ["text"],
+    },
+  },
+  {
+    name: "phone_key",
+    description: "Press back or home on the Android phone.",
+    parameters: {
+      type: "object",
+      properties: { key: { type: "string", description: "back or home" } },
+      required: ["key"],
+    },
+  },
+  {
     name: "file_task",
     description: "File an internal task. Set needsYou when a human must act.",
     parameters: {

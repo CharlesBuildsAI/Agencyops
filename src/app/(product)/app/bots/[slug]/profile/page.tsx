@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { AgentResources } from "@/components/agent-resources";
 import { BotAvatar } from "@/components/bot-avatar";
 import { PauseButton } from "@/components/editors";
 import { requireUser } from "@/lib/auth";
@@ -25,7 +26,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
           <BotAvatar slug={desk.bot.slug} color={desk.bot.color} size={48} mood={desk.call ? "working" : "idle"} />
           <div className="head-copy">
             <b>{desk.bot.name}</b>
-            <span>{desk.bot.roleTitle} · Rivera Insurance</span>
+            <span>{desk.bot.roleTitle} · {user.agency.name}</span>
           </div>
           <PauseButton slug={desk.bot.slug} paused={desk.bot.paused} />
         </header>
@@ -35,10 +36,19 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
           <div className="line"><span>Email<small>{desk.bot.email}</small></span></div>
           <div className="line"><span>SMS<small>Texts from her number</small></span></div>
         </div>
+        <AgentResources
+          slug={desk.bot.slug}
+          email={desk.bot.email}
+          phone={desk.bot.phone}
+          orgoStatus={desk.bot.orgoStatus}
+          orgoComputerId={desk.bot.orgoComputerId}
+          composioSummary={desk.bot.composioSummary}
+          errors={desk.bot.provision}
+        />
         <div className="block">
           <h2>Computer</h2>
           <div className="line">
-            <span>Orgo cloud · 4 screens<small>4 cores · 16 GB</small></span>
+            <span>{desk.bot.orgoComputerId ? `Desktop · ${desk.bot.orgoStatus || "created"}` : "Android phone is the main device"}<small>{desk.bot.orgoComputerId ? desk.bot.orgoComputerId : "A desktop computer is optional"}</small></span>
             <a className="btn btn-quiet btn-sm" href={`/app/bots/${desk.bot.slug}?screen=1`}>Open</a>
           </div>
         </div>

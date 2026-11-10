@@ -20,6 +20,8 @@ model Agency {
   callBase        Int           @default(0)
   approvalBase    Int           @default(0)
   answeredRate    Int           @default(92)
+  industry        String        @default("")
+  setupComplete   Boolean       @default(false)
   createdAt       DateTime      @default(now())
   users           User[]
   invites         Invite[]
@@ -85,6 +87,15 @@ model Bot {
   pausedReason    String        @default("")
   sortOrder       Int           @default(0)
   computerJson    String        @default("{}")
+  mailInboxId     String        @default("")
+  phoneNumberId   String        @default("")
+  orgoComputerId  String        @default("")
+  orgoStatus      String        @default("")
+  composioSummary String        @default("")
+  provisionJson   String        @default("{}")
+  phoneDeviceId   String        @default("")
+  phoneProvider   String        @default("")
+  accountsJson    String        @default("[]")
   agency          Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   threads         Thread[]
   messages        Message[]
