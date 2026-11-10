@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth-token";
 
-const OPEN_API = [/^\/api\/auth\/login$/, /^\/api\/auth\/accept$/, /^\/api\/webhooks\//];
+const OPEN_API = [/^\/api\/auth\/login$/, /^\/api\/auth\/accept$/, /^\/api\/webhooks\//, /^\/api\/setup\//];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
