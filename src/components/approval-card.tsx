@@ -50,7 +50,9 @@ export function ApprovalCard({ approval, slug }: { approval: ApprovalCardData; s
         ? "Needs you · file"
         : approval.kind === "call"
           ? "Needs you · call"
-          : "Needs you · SMS";
+          : approval.kind === "phone"
+            ? "Needs you · phone"
+            : "Needs you · SMS";
 
   return (
     <article className="card">
@@ -77,6 +79,12 @@ export function ApprovalCard({ approval, slug }: { approval: ApprovalCardData; s
           </p>
         </>
       )}
+      {approval.kind === "phone" && (
+        <>
+          <h3>{approval.title}</h3>
+          <p>This uses the Android phone. Nothing is installed, sent, posted, or paid until you approve.</p>
+        </>
+      )}
       {approval.kind === "call" && (
         <>
           <h3>{approval.payload.contactName || approval.payload.to}</h3>
@@ -99,7 +107,7 @@ export function ApprovalCard({ approval, slug }: { approval: ApprovalCardData; s
           ) : (
             <Button size="sm" onClick={() => act("approve")} disabled={busy}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m5 12 5 5L20 7" /></svg>
-              {approval.kind === "sms" ? "Approve SMS" : "Approve"}
+              {approval.kind === "sms" ? "Approve SMS" : approval.kind === "phone" ? "Approve install" : "Approve"}
             </Button>
           )}
           {approval.kind !== "file" && approval.kind !== "email" && (

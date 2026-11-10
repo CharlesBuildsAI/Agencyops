@@ -218,6 +218,16 @@ export async function loadDesk(agencyId: string, slug: string) {
       instructions: bot.instructions,
       orgoStatus: bot.orgoStatus,
       orgoComputerId: bot.orgoComputerId,
+      phoneDeviceId: bot.phoneDeviceId,
+      phoneProvider: bot.phoneProvider,
+      accounts: (() => {
+        try {
+          const parsed = JSON.parse(bot.accountsJson) as { name?: string; status?: string }[];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      })(),
       composioSummary: bot.composioSummary,
       provision: (() => {
         try {

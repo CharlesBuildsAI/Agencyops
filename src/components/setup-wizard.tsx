@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-const STEPS = ["Business", "Account", "Email", "Phone", "Desktop", "Apps", "Model", "Team"] as const;
+const STEPS = ["Business", "Account", "Phone", "Model", "Email", "Apps", "Desktop", "Team"] as const;
 
 type Secrets = {
   agentmail: string;
@@ -148,7 +148,7 @@ export function SetupWizard() {
             <label>Password<Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" /></label>
           </div>
         )}
-        {step === 2 && (
+        {step === 4 && (
           <KeyStep
             label="AgentMail API key"
             href="https://www.agentmail.to/docs/quickstart"
@@ -159,7 +159,7 @@ export function SetupWizard() {
             busy={busy}
           />
         )}
-        {step === 3 && (
+        {step === 2 && (
           <div className="form-grid">
             <p className="muted">Each agent gets its own Android phone. Mobilerun is the phone we can drive from the desk. Limrun is the other phone key. Skip and the phone stays a demo screen.</p>
             <label className="follow-toggle"><input type="radio" checked={phoneChoice === "mobilerun"} onChange={() => setPhoneChoice("mobilerun")} /> Mobilerun</label>
@@ -193,7 +193,7 @@ export function SetupWizard() {
             <label>Twilio token<Input type="password" value={secrets.twilioToken} onChange={(event) => setSecrets({ ...secrets, twilioToken: event.target.value })} /></label>
           </div>
         )}
-        {step === 4 && (
+        {step === 6 && (
           <KeyStep
             label="Orgo API key"
             href="https://docs.orgo.ai/quickstart"
@@ -217,7 +217,7 @@ export function SetupWizard() {
             note="Apps are connected by you in Composio. This desk lists them. It does not open accounts on other sites."
           />
         )}
-        {step === 6 && (
+        {step === 3 && (
           <KeyStep
             label="Anthropic or OpenAI key"
             href="https://console.anthropic.com/"

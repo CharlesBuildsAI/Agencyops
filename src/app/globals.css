@@ -99,7 +99,7 @@ button { cursor: pointer; }
 .side-head, .side-foot, .row, .spread { display: flex; align-items: center; }
 .side-head { gap: 8px; padding: 2px 6px 12px; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-.brand strong { display: block; font-size: 14.5px; font-weight: 620; letter-spacing: -0.02em; }
+.brand strong { display: block; font-size: 14.5px; font-weight: 680; letter-spacing: -0.02em; color: var(--ink); }
 .brand em { display: block; font-style: normal; color: var(--faint); font-size: 12px; margin-top: 1px; }
 .mark, .avatar {
   width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center;
@@ -137,7 +137,8 @@ button { cursor: pointer; }
 .team-row.active { background: var(--solid); box-shadow: 0 10px 24px var(--shadow); }
 .who-top { display: flex; gap: 6px; align-items: baseline; min-width: 0; }
 .who-top b { font-weight: 620; font-size: 14px; letter-spacing: -0.02em; }
-.who-top i { font-style: normal; color: var(--faint); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who-top b { color: var(--ink); font-weight: 680; }
+.who-top i { font-style: normal; color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .who-sub { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .team-row.paused .who-sub { color: var(--faint); }
 .when { color: var(--faint); font-size: 12px; text-align: right; }
@@ -218,7 +219,8 @@ button { cursor: pointer; }
 .live-dot { width: 8px; height: 8px; border-radius: 99px; background: #6fdb8e; box-shadow: 0 0 0 4px rgba(111,219,142,.12); }
 .head-copy { min-width: 0; flex: 1; }
 .head-copy b { display: block; letter-spacing: -0.02em; }
-.head-copy span { color: var(--faint); font-size: 12.5px; }
+.head-copy b { color: var(--ink); }
+.head-copy span { color: var(--muted); font-size: 12.5px; }
 .head-tools { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .wave { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
 .wave i {
@@ -358,12 +360,27 @@ textarea.field { height: auto; padding: 10px 12px; }
 .form-grid { display: grid; gap: 10px; max-width: 520px; }
 .stack { display: grid; gap: 14px; }
 .profile-wrap { display: flex; gap: 8px; min-width: 0; min-height: 0; flex: 1; }
-.profile-mid { flex: 1; display: grid; place-items: center; color: var(--faint); }
+.profile-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--ink); overflow: auto; }
+.chat-with { color: var(--ink); font-weight: 680; }
+.phone-desk { display: flex; gap: 18px; align-items: flex-start; width: min(760px, 100%); }
+.handset { width: 230px; flex: none; background: var(--solid); border-radius: 28px; padding: 12px; box-shadow: inset 0 1px 0 var(--rim); }
+.handset-title { text-align: center; font-size: 13px; font-weight: 680; color: var(--ink); margin-bottom: 8px; }
+.handset-screen { width: 100%; aspect-ratio: 9 / 19.5; border: 0; border-radius: 22px; overflow: hidden; background: #17345e; color: #f4fbff; padding: 0; }
+.handset-screen img { width: 100%; height: 100%; object-fit: cover; }
+.demo-screen { display: grid; gap: 8px; place-items: center; height: 100%; padding: 16px; text-align: center; }
+.demo-screen strong, .demo-screen em, .demo-screen span { color: #f4fbff; }
+.demo-screen em { font-style: normal; font-weight: 680; }
+.handset-keys { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+.phone-facts { flex: 1; min-width: 0; color: var(--ink); }
+.phone-facts p { margin: 0 0 8px; }
+.account-list { list-style: none; display: grid; gap: 6px; margin: 8px 0 12px; }
+.account-list li { display: flex; justify-content: space-between; gap: 8px; color: var(--ink); }
+.account-list span { color: var(--muted); font-weight: 560; }
 .profile-side { width: min(460px, 48%); padding: 18px; overflow: auto; gap: 12px; }
 .block { background: var(--chip); box-shadow: inset 0 1px 0 var(--rim); border-radius: 20px; padding: 4px 14px; }
 .block h2 { font-size: 13px; color: var(--muted); font-weight: 600; margin: 12px 0; }
-.line { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
-.line small { color: var(--faint); display: block; }
+.line { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); color: var(--ink); font-weight: 640; }
+.line small { color: var(--muted); display: block; font-weight: 500; }
 
 .audit { width: 100%; border-collapse: collapse; font-size: 13px; }
 .audit th { text-align: left; color: var(--faint); font-weight: 560; font-size: 11px; letter-spacing: 0.12em; padding: 8px; }

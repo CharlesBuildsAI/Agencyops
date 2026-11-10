@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { AgentResources } from "@/components/agent-resources";
+import { AndroidPhone } from "@/components/android-phone";
 import { BotAvatar } from "@/components/bot-avatar";
 import { PauseButton } from "@/components/editors";
 import { requireUser } from "@/lib/auth";
@@ -15,11 +15,16 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
   return (
     <div className="profile-wrap">
       <section className="panel profile-mid">
-        <div style={{ textAlign: "center" }}>
-          <BotAvatar slug={desk.bot.slug} color={desk.bot.color} size={148} mood={desk.call ? "working" : "idle"} />
-          <p style={{ marginTop: 12 }}>Chat with {desk.bot.name}</p>
-          <a className="btn btn-ghost btn-sm" href={`/app/bots/${desk.bot.slug}`} style={{ marginTop: 12 }}>Open chat</a>
-        </div>
+        <AndroidPhone
+          slug={desk.bot.slug}
+          name={desk.bot.name}
+          phone={desk.bot.phone}
+          email={desk.bot.email}
+          hasDevice={Boolean(desk.bot.phoneDeviceId)}
+          provider={desk.bot.phoneProvider}
+          accounts={desk.bot.accounts}
+        />
+        <p className="chat-with"><a href={`/app/bots/${desk.bot.slug}`}>Chat with {desk.bot.name}</a></p>
       </section>
       <aside className="panel profile-side">
         <header className="chat-head" style={{ paddingLeft: 0 }}>
@@ -34,24 +39,17 @@ export default async function ProfilePage({ params }: { params: Promise<{ slug: 
           <h2>Reach {desk.bot.name}</h2>
           <div className="line"><span>Phone<small>{desk.bot.phone}</small></span><a className="btn btn-ghost btn-sm" href={`/app/bots/${desk.bot.slug}/call`}>Call</a></div>
           <div className="line"><span>Email<small>{desk.bot.email}</small></span></div>
-          <div className="line"><span>SMS<small>Texts from her number</small></span></div>
+          <div className="line"><span>SMS<small>Texts from this number</small></span></div>
         </div>
-        <AgentResources
-          slug={desk.bot.slug}
-          email={desk.bot.email}
-          phone={desk.bot.phone}
-          orgoStatus={desk.bot.orgoStatus}
-          orgoComputerId={desk.bot.orgoComputerId}
-          composioSummary={desk.bot.composioSummary}
-          errors={desk.bot.provision}
-        />
-        <div className="block">
-          <h2>Computer</h2>
-          <div className="line">
-            <span>{desk.bot.orgoComputerId ? `Desktop · ${desk.bot.orgoStatus || "created"}` : "Android phone is the main device"}<small>{desk.bot.orgoComputerId ? desk.bot.orgoComputerId : "A desktop computer is optional"}</small></span>
-            <a className="btn btn-quiet btn-sm" href={`/app/bots/${desk.bot.slug}?screen=1`}>Open</a>
+        {desk.bot.orgoComputerId ? (
+          <div className="block">
+            <h2>Optional desktop</h2>
+            <div className="line">
+              <span>Desktop · {desk.bot.orgoStatus || "created"}<small>{desk.bot.orgoComputerId}</small></span>
+              <a className="btn btn-quiet btn-sm" href={`/app/bots/${desk.bot.slug}?screen=1`}>Open</a>
+            </div>
           </div>
-        </div>
+        ) : null}
         <div className="block" style={{ paddingBottom: 14 }}>
           <h2>This month</h2>
           <div className="spread" style={{ justifyContent: "space-between" }}>
